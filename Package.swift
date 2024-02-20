@@ -5,17 +5,21 @@ import PackageDescription
 
 let package = Package(
     name: "PullToRefreshSwiftUI",
+    platforms: [
+        .iOS(.v17)
+    ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "PullToRefreshSwiftUI",
             targets: ["PullToRefreshSwiftUI"]),
     ],
+    dependencies: [
+        .package(url: "https://github.com/airbnb/lottie-spm.git", from: "4.4.0")
+    ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "PullToRefreshSwiftUI"),
+            name: "PullToRefreshSwiftUI",
+            dependencies: [.product(name: "Lottie", package: "lottie-spm")]),
         .testTarget(
             name: "PullToRefreshSwiftUITests",
             dependencies: ["PullToRefreshSwiftUI"]),

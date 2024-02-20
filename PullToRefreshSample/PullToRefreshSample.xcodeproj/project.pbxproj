@@ -8,18 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		A51D6A4F2B83DE8000E44E19 /* PullToRefreshSampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A51D6A4E2B83DE8000E44E19 /* PullToRefreshSampleApp.swift */; };
-		A51D6A512B83DE8000E44E19 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A51D6A502B83DE8000E44E19 /* ContentView.swift */; };
 		A51D6A612B83E0E800E44E19 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A51D6A5E2B83E0E800E44E19 /* Assets.xcassets */; };
 		A51D6A622B83E0E800E44E19 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A51D6A602B83E0E800E44E19 /* Preview Assets.xcassets */; };
+		A54348322B84672600D1DDB0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54348312B84672600D1DDB0 /* ContentView.swift */; };
+		A54348352B84689A00D1DDB0 /* animation-refreshing-shakuro_logo.json in Resources */ = {isa = PBXBuildFile; fileRef = A54348332B84689A00D1DDB0 /* animation-refreshing-shakuro_logo.json */; };
+		A54348362B84689A00D1DDB0 /* animation-pulling-shakuro_logo.json in Resources */ = {isa = PBXBuildFile; fileRef = A54348342B84689A00D1DDB0 /* animation-pulling-shakuro_logo.json */; };
+		A56DF71D2B852C2C00477FBD /* PullToRefreshSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A56DF71C2B852C2C00477FBD /* PullToRefreshSwiftUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A51D6A4B2B83DE8000E44E19 /* PullToRefreshSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PullToRefreshSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A51D6A4E2B83DE8000E44E19 /* PullToRefreshSampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefreshSampleApp.swift; sourceTree = "<group>"; };
-		A51D6A502B83DE8000E44E19 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A51D6A5C2B83DE9B00E44E19 /* PullToRefreshSwiftUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = PullToRefreshSwiftUI; path = ..; sourceTree = "<group>"; };
 		A51D6A5E2B83E0E800E44E19 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A51D6A602B83E0E800E44E19 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		A54348312B84672600D1DDB0 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A54348332B84689A00D1DDB0 /* animation-refreshing-shakuro_logo.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "animation-refreshing-shakuro_logo.json"; path = "../../../../Portal/Portal/Resources/animation-refreshing-shakuro_logo.json"; sourceTree = "<group>"; };
+		A54348342B84689A00D1DDB0 /* animation-pulling-shakuro_logo.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "animation-pulling-shakuro_logo.json"; path = "../../../../Portal/Portal/Resources/animation-pulling-shakuro_logo.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -27,6 +32,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A56DF71D2B852C2C00477FBD /* PullToRefreshSwiftUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -37,8 +43,9 @@
 			isa = PBXGroup;
 			children = (
 				A51D6A5C2B83DE9B00E44E19 /* PullToRefreshSwiftUI */,
-				A51D6A4D2B83DE8000E44E19 /* PullToRefreshSample */,
+				A51D6A4D2B83DE8000E44E19 /* PullToRefreshSampleiOS */,
 				A51D6A4C2B83DE8000E44E19 /* Products */,
+				A56DF71B2B852C2C00477FBD /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -50,19 +57,20 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A51D6A4D2B83DE8000E44E19 /* PullToRefreshSample */ = {
+		A51D6A4D2B83DE8000E44E19 /* PullToRefreshSampleiOS */ = {
 			isa = PBXGroup;
 			children = (
-				A51D6A4E2B83DE8000E44E19 /* PullToRefreshSampleApp.swift */,
-				A51D6A502B83DE8000E44E19 /* ContentView.swift */,
+				A543482F2B8466B100D1DDB0 /* Application */,
 				A51D6A5D2B83E0E800E44E19 /* Resources */,
 			);
-			path = PullToRefreshSample;
+			path = PullToRefreshSampleiOS;
 			sourceTree = "<group>";
 		};
 		A51D6A5D2B83E0E800E44E19 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A54348342B84689A00D1DDB0 /* animation-pulling-shakuro_logo.json */,
+				A54348332B84689A00D1DDB0 /* animation-refreshing-shakuro_logo.json */,
 				A51D6A5E2B83E0E800E44E19 /* Assets.xcassets */,
 				A51D6A5F2B83E0E800E44E19 /* Preview Content */,
 			);
@@ -75,6 +83,30 @@
 				A51D6A602B83E0E800E44E19 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		A543482F2B8466B100D1DDB0 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				A51D6A4E2B83DE8000E44E19 /* PullToRefreshSampleApp.swift */,
+				A54348302B84672600D1DDB0 /* UI */,
+			);
+			name = Application;
+			sourceTree = "<group>";
+		};
+		A54348302B84672600D1DDB0 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				A54348312B84672600D1DDB0 /* ContentView.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		A56DF71B2B852C2C00477FBD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -93,6 +125,9 @@
 			dependencies = (
 			);
 			name = PullToRefreshSample;
+			packageProductDependencies = (
+				A56DF71C2B852C2C00477FBD /* PullToRefreshSwiftUI */,
+			);
 			productName = PullToRefreshSample;
 			productReference = A51D6A4B2B83DE8000E44E19 /* PullToRefreshSample.app */;
 			productType = "com.apple.product-type.application";
@@ -136,6 +171,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A51D6A622B83E0E800E44E19 /* Preview Assets.xcassets in Resources */,
+				A54348362B84689A00D1DDB0 /* animation-pulling-shakuro_logo.json in Resources */,
+				A54348352B84689A00D1DDB0 /* animation-refreshing-shakuro_logo.json in Resources */,
 				A51D6A612B83E0E800E44E19 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -147,7 +184,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A51D6A512B83DE8000E44E19 /* ContentView.swift in Sources */,
+				A54348322B84672600D1DDB0 /* ContentView.swift in Sources */,
 				A51D6A4F2B83DE8000E44E19 /* PullToRefreshSampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -281,7 +318,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"PullToRefreshSample/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "PullToRefreshSampleiOS/Resources/Preview\\ Content";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -309,7 +346,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"PullToRefreshSample/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "PullToRefreshSampleiOS/Resources/Preview\\ Content";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -352,6 +389,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A56DF71C2B852C2C00477FBD /* PullToRefreshSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PullToRefreshSwiftUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A51D6A432B83DE8000E44E19 /* Project object */;
 }

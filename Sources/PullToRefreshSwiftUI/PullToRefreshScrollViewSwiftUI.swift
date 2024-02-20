@@ -1,28 +1,30 @@
-//
-//
-//
-
 import SwiftUI
 
-internal struct PullToRefreshScrollViewSwiftUIOptions {
+public struct PullToRefreshScrollViewSwiftUIOptions {
 
-    internal enum Constant {
+    public enum Constant {
         static let animationDuration: TimeInterval = 0.3
     }
 
-    internal let lottieViewBackgroundColor: UIColor
-    internal let pullingLottieFileName: String
-    internal let refreshingLottieFileName: String
+    public let lottieViewBackgroundColor: UIColor
+    public let pullingLottieFileName: String
+    public let refreshingLottieFileName: String
+
+    public init(lottieViewBackgroundColor: UIColor, pullingLottieFileName: String, refreshingLottieFileName: String) {
+        self.lottieViewBackgroundColor = lottieViewBackgroundColor
+        self.pullingLottieFileName = pullingLottieFileName
+        self.refreshingLottieFileName = refreshingLottieFileName
+    }
 
 }
 
-private enum Constant {
-    static let coordinateSpace: String = "PullToRefreshScrollViewSwiftUI.CoordinateSpace"
-    static let height: CGFloat = 100
-    static let offset: CGFloat = 8
+public enum PullToRefreshScrollViewSwiftUIConstant {
+    public static let coordinateSpace: String = "PullToRefreshScrollViewSwiftUI.CoordinateSpace"
+    public static let height: CGFloat = 100
+    public static let offset: CGFloat = 8
 }
 
-internal struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
+public struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
 
     private let options: PullToRefreshScrollViewSwiftUIOptions
     private let refreshViewHeight: CGFloat
@@ -36,13 +38,13 @@ internal struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
 
     // MARK: - Initialization
 
-    internal init(options: PullToRefreshScrollViewSwiftUIOptions,
-                  refreshViewHeight: CGFloat = (Constant.offset * 2 + Constant.height),
-                  showsIndicators: Bool = true,
-                  isPullToRefreshEnabled: Bool = true,
-                  isRefreshing: Binding<Bool>,
-                  onRefresh: @escaping () -> Void,
-                  @ViewBuilder contentViewBuilder: @escaping (_ scrollViewSize: CGSize) -> ContentViewType) {
+    public init(options: PullToRefreshScrollViewSwiftUIOptions,
+                refreshViewHeight: CGFloat = (PullToRefreshScrollViewSwiftUIConstant.offset * 2 + PullToRefreshScrollViewSwiftUIConstant.height),
+                showsIndicators: Bool = true,
+                isPullToRefreshEnabled: Bool = true,
+                isRefreshing: Binding<Bool>,
+                onRefresh: @escaping () -> Void,
+                @ViewBuilder contentViewBuilder: @escaping (_ scrollViewSize: CGSize) -> ContentViewType) {
         self.options = options
         self.refreshViewHeight = refreshViewHeight
         self.showsIndicators = showsIndicators
@@ -54,18 +56,18 @@ internal struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
 
     // MARK: - UI
 
-    internal var body: some View {
+    public var body: some View {
         let defaultAnimation: Animation = .easeInOut(duration: PullToRefreshScrollViewSwiftUIOptions.Constant.animationDuration)
         ZStack(alignment: .top, content: {
             ZStack(alignment: .center, content: {
                 refreshingView()
-                    .frame(height: Constant.height)
-                    .offset(y: Constant.offset)
+                    .frame(height: PullToRefreshScrollViewSwiftUIConstant.height)
+                    .offset(y: PullToRefreshScrollViewSwiftUIConstant.offset)
                     .opacity(scrollViewState.isTriggered ? 1 : 0)
                     .animation(defaultAnimation, value: scrollViewState.isTriggered)
                 pullingView()
-                    .frame(height: Constant.height)
-                    .offset(y: Constant.offset)
+                    .frame(height: PullToRefreshScrollViewSwiftUIConstant.height)
+                    .offset(y: PullToRefreshScrollViewSwiftUIConstant.offset)
                     .opacity(scrollViewState.isTriggered ? 0 : 1)
                     .animation(defaultAnimation, value: scrollViewState.isTriggered)
             })
@@ -86,7 +88,7 @@ internal struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
                         .offset(y: refreshViewHeight * scrollViewState.progress)
                         .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
                     })
-                    .offset(coordinateSpace: Constant.coordinateSpace, offset: { offset in
+                    .offset(coordinateSpace: PullToRefreshScrollViewSwiftUIConstant.coordinateSpace, offset: { offset in
                         scrollViewState.contentOffset = offset
                         updateProgressIfNeeded()
                         stopIfNeeded()
@@ -95,7 +97,7 @@ internal struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
                     })
                 })
                 .scrollClipDisabled(true)
-                .coordinateSpace(name: Constant.coordinateSpace)
+                .coordinateSpace(name: PullToRefreshScrollViewSwiftUIConstant.coordinateSpace)
             })
             .onChange(of: scrollViewState.isTriggered, { (_, isTriggered) in
                 guard isTriggered else {
@@ -186,8 +188,8 @@ struct PullToRefreshScrollViewSwiftUI_Previews: PreviewProvider {
 
     static var previews: some View {
         let options = PullToRefreshScrollViewSwiftUIOptions(lottieViewBackgroundColor: .green,
-                                                            pullingLottieFileName: R.file.animationPullingShakuro_logoJson.name,
-                                                            refreshingLottieFileName: R.file.animationRefreshingShakuro_logoJson.name)
+                                                            pullingLottieFileName: "animation-pulling-shakuro_logo",
+                                                            refreshingLottieFileName: "animation-refreshing-shakuro_logo")
         PullToRefreshScrollViewSwiftUI(
             options: options,
             isRefreshing: .constant(true),
