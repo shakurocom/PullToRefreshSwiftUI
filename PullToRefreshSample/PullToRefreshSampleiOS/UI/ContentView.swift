@@ -1,28 +1,17 @@
-import PullToRefreshSwiftUI
 import SwiftUI
 
 struct ContentView: View {
 
-    @State private var isRefreshing: Bool = false
+    @State private var preferredColumn = NavigationSplitViewColumn.detail
 
+//https://developer.apple.com/documentation/swiftui/navigationsplitview
+//    navigationsplitview + navigationstack
     var body: some View {
-        let options = PullToRefreshScrollViewSwiftUIOptions(lottieViewBackgroundColor: .green,
-                                                            pullingLottieFileName: "animation-pulling-shakuro_logo",
-                                                            refreshingLottieFileName: "animation-refreshing-shakuro_logo")
-        PullToRefreshScrollViewSwiftUI(
-            options: options,
-            isRefreshing: $isRefreshing,
-            onRefresh: {
-                debugPrint("Refreshing")
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(5), execute: {
-                    isRefreshing = false
-                })
-            },
-            contentViewBuilder: { _ in
-                Rectangle()
-                    .fill(.red)
-                    .frame(height: 1000)
-            })
+        NavigationSplitView(preferredCompactColumn: $preferredColumn) {
+            Color.yellow
+        } detail: {
+            ScrollContentView()
+        }
     }
 
 }
