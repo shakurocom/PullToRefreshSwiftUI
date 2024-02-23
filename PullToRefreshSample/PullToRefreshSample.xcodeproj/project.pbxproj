@@ -11,11 +11,11 @@
 		A51D6A612B83E0E800E44E19 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A51D6A5E2B83E0E800E44E19 /* Assets.xcassets */; };
 		A51D6A622B83E0E800E44E19 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A51D6A602B83E0E800E44E19 /* Preview Assets.xcassets */; };
 		A54348322B84672600D1DDB0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54348312B84672600D1DDB0 /* ContentView.swift */; };
-		A54348352B84689A00D1DDB0 /* animation-refreshing-shakuro_logo.json in Resources */ = {isa = PBXBuildFile; fileRef = A54348332B84689A00D1DDB0 /* animation-refreshing-shakuro_logo.json */; };
-		A54348362B84689A00D1DDB0 /* animation-pulling-shakuro_logo.json in Resources */ = {isa = PBXBuildFile; fileRef = A54348342B84689A00D1DDB0 /* animation-pulling-shakuro_logo.json */; };
 		A56DF71D2B852C2C00477FBD /* PullToRefreshSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A56DF71C2B852C2C00477FBD /* PullToRefreshSwiftUI */; };
 		A5BA6BAD2B870CEE00DAE39C /* ScrollContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5BA6BAC2B870CEE00DAE39C /* ScrollContentView.swift */; };
 		A5BA6BAF2B870D0100DAE39C /* ListContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5BA6BAE2B870D0100DAE39C /* ListContentView.swift */; };
+		A5DD89652B8867C600EF70A5 /* animation-refreshing-shakuro_logo.json in Resources */ = {isa = PBXBuildFile; fileRef = A5DD89632B8867C600EF70A5 /* animation-refreshing-shakuro_logo.json */; };
+		A5DD89662B8867C600EF70A5 /* animation-pulling-shakuro_logo.json in Resources */ = {isa = PBXBuildFile; fileRef = A5DD89642B8867C600EF70A5 /* animation-pulling-shakuro_logo.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,10 +25,10 @@
 		A51D6A5E2B83E0E800E44E19 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A51D6A602B83E0E800E44E19 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A54348312B84672600D1DDB0 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A54348332B84689A00D1DDB0 /* animation-refreshing-shakuro_logo.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "animation-refreshing-shakuro_logo.json"; path = "../../../../Portal/Portal/Resources/animation-refreshing-shakuro_logo.json"; sourceTree = "<group>"; };
-		A54348342B84689A00D1DDB0 /* animation-pulling-shakuro_logo.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "animation-pulling-shakuro_logo.json"; path = "../../../../Portal/Portal/Resources/animation-pulling-shakuro_logo.json"; sourceTree = "<group>"; };
 		A5BA6BAC2B870CEE00DAE39C /* ScrollContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollContentView.swift; sourceTree = "<group>"; };
 		A5BA6BAE2B870D0100DAE39C /* ListContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListContentView.swift; sourceTree = "<group>"; };
+		A5DD89632B8867C600EF70A5 /* animation-refreshing-shakuro_logo.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "animation-refreshing-shakuro_logo.json"; sourceTree = "<group>"; };
+		A5DD89642B8867C600EF70A5 /* animation-pulling-shakuro_logo.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "animation-pulling-shakuro_logo.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,8 +73,8 @@
 		A51D6A5D2B83E0E800E44E19 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				A54348342B84689A00D1DDB0 /* animation-pulling-shakuro_logo.json */,
-				A54348332B84689A00D1DDB0 /* animation-refreshing-shakuro_logo.json */,
+				A5DD89642B8867C600EF70A5 /* animation-pulling-shakuro_logo.json */,
+				A5DD89632B8867C600EF70A5 /* animation-refreshing-shakuro_logo.json */,
 				A51D6A5E2B83E0E800E44E19 /* Assets.xcassets */,
 				A51D6A5F2B83E0E800E44E19 /* Preview Content */,
 			);
@@ -177,8 +177,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A51D6A622B83E0E800E44E19 /* Preview Assets.xcassets in Resources */,
-				A54348362B84689A00D1DDB0 /* animation-pulling-shakuro_logo.json in Resources */,
-				A54348352B84689A00D1DDB0 /* animation-refreshing-shakuro_logo.json in Resources */,
+				A5DD89662B8867C600EF70A5 /* animation-pulling-shakuro_logo.json in Resources */,
+				A5DD89652B8867C600EF70A5 /* animation-refreshing-shakuro_logo.json in Resources */,
 				A51D6A612B83E0E800E44E19 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
