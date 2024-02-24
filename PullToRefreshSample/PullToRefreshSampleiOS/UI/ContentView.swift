@@ -2,15 +2,39 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @State private var preferredColumn = NavigationSplitViewColumn.detail
+    private enum Option {
+        case list
+        case scroll
+    }
 
-//https://developer.apple.com/documentation/swiftui/navigationsplitview
-//    navigationsplitview + navigationstack
+    @State private var preferredColumn = NavigationSplitViewColumn.sidebar
+    @State private var options: [Option] = [.list, .scroll]
+    @State private var selectedOption: Option?
+
     var body: some View {
         NavigationSplitView(preferredCompactColumn: $preferredColumn) {
-            Color.yellow
+            List(selection: $selectedOption) {
+                ForEach(Array(options), id: \.self) { (option) in
+                    NavigationLink(value: option) {
+                        switch option {
+                        case .list:
+                            Text("List View")
+                        case .scroll:
+                            Text("Scroll View")
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Options")
         } detail: {
-            ScrollContentView()
+            switch selectedOption {
+            case .list:
+                ListContentView()
+            case .scroll:
+                ScrollContentView()
+            case .none:
+                Text("Choose an item from the content")
+            }
         }
     }
 
