@@ -21,7 +21,7 @@ public struct PullToRefreshScrollViewSwiftUIOptions {
 public enum PullToRefreshScrollViewSwiftUIConstant {
     public static let coordinateSpace: String = "PullToRefreshScrollViewSwiftUI.CoordinateSpace"
     public static let height: CGFloat = 100
-    public static let offset: CGFloat = 8
+    public static let offset: CGFloat = 0
 }
 
 public struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
@@ -75,19 +75,18 @@ public struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
             GeometryReader(content: { geometryProxy in
                 ScrollView(.vertical, showsIndicators: showsIndicators, content: {
                     VStack(spacing: 0, content: {
-                        ZStack(content: {
-                            if #available(iOS 17.0, *) {
-                                contentViewBuilder(geometryProxy.size)
-                                // https://medium.com/the-swift-cooperative/swiftui-geometrygroup-guide-from-theory-to-practice-1a7f4b04c4ec
-                                    .geometryGroup()
-                            } else {
-                                contentViewBuilder(geometryProxy.size)
-                                    .transformEffect(.identity)
-                            }
-                        })
-                        .offset(y: refreshViewHeight * scrollViewState.progress)
-                        .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
+                        Color.clear
+                            .frame(height: refreshViewHeight * scrollViewState.progress)
+                        if #available(iOS 17.0, *) {
+                            contentViewBuilder(geometryProxy.size)
+                            // https://medium.com/the-swift-cooperative/swiftui-geometrygroup-guide-from-theory-to-practice-1a7f4b04c4ec
+                                .geometryGroup()
+                        } else {
+                            contentViewBuilder(geometryProxy.size)
+                                .transformEffect(.identity)
+                        }
                     })
+                    .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
                     .offset(coordinateSpace: PullToRefreshScrollViewSwiftUIConstant.coordinateSpace, offset: { offset in
                         scrollViewState.contentOffset = offset
                         updateProgressIfNeeded()
