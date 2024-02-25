@@ -52,11 +52,11 @@ If you prefer not to use CocoaPods, you can integrate Shakuro.PullToRefreshSwift
 
 ## Usage
 
-Have a look at the [PullToRefreshSampleiOS](https://github.com/shakurocom/PullToRefreshSwiftUI/tree/master/PullToRefreshSampleiOS)
+Have a look at the [PullToRefreshSampleiOS](https://github.com/shakurocom/PullToRefreshSwiftUI/tree/main/PullToRefreshSample)
 
 ## License
 
-Shakuro.PullToRefreshSwiftUI is released under the MIT license. [See LICENSE](https://github.com/shakurocom/PullToRefreshSwiftUI/blob/master/LICENSE.md) for details.
+Shakuro.PullToRefreshSwiftUI is released under the MIT license. [See LICENSE](https://github.com/shakurocom/PullToRefreshSwiftUI/blob/main/LICENSE.md) for details.
 
 ## Give it a try and reach us
 
