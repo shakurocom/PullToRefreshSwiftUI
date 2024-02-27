@@ -68,7 +68,7 @@ public struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
                 pullingView()
                     .frame(height: PullToRefreshScrollViewSwiftUIConstant.height)
                     .offset(y: PullToRefreshScrollViewSwiftUIConstant.offset)
-                    .opacity(scrollViewState.isTriggered ? 0 : 1)
+                    .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
                     .animation(defaultAnimation, value: scrollViewState.isTriggered)
             })
             .opacity(isPullToRefreshEnabled ? 1 : 0)
