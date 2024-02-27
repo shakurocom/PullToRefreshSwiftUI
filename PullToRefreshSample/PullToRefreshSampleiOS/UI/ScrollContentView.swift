@@ -6,7 +6,7 @@ struct ScrollContentView: View {
     @State private var isRefreshing: Bool = false
 
     var body: some View {
-        let options = PullToRefreshScrollViewSwiftUIOptions(lottieViewBackgroundColor: .green,
+        let options = PullToRefreshScrollViewSwiftUIOptions(lottieViewBackgroundColor: .clear,
                                                             pullingLottieFileName: "animation-pulling-shakuro_logo",
                                                             refreshingLottieFileName: "animation-refreshing-shakuro_logo")
         PullToRefreshScrollViewSwiftUI(
@@ -20,7 +20,7 @@ struct ScrollContentView: View {
             },
             contentViewBuilder: { _ in
                 Rectangle()
-                    .fill(.red)
+                    .fill(.gray)
                     .frame(height: 1000)
             })
     }
