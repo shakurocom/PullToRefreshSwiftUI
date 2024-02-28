@@ -10,19 +10,11 @@
 - [Usage](#usage)
 - [License](#license)
 
-A `PullToRefreshSwiftUI` is a custom control that you attach to any UIScrollView object, including table views and collection views. `PullToRefreshSwiftUI` has various configuration options.
+A `PullToRefreshScrollViewSwiftUI` is a custom control that alows to put some content on scroll with pull to refresh action.
 
-`PullToRefreshSwiftUI` example with default options:
+`PullToRefreshSwiftUI` example:
 
 ![](Resources/pull_to_refresh_example_1.gif)
-
-`PullToRefreshSwiftUI` example with animation logo:
-
-![](Resources/pull_to_refresh_example_2.gif)
-
-`PullToRefreshSwiftUI` example with sticky headers:
-
-![](Resources/pull_to_refresh_example_3.gif)
 
 ## Requirements
 
@@ -31,6 +23,22 @@ A `PullToRefreshSwiftUI` is a custom control that you attach to any UIScrollView
 - Swift 5.9+
 
 ## Installation
+
+### Swift Package Manager
+
+**App dependency**
+
+Select File > Add Package Dependencies and enter the repository URL ([Adding Package Dependencies to Your App](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app))
+
+**Package dependency**
+
+Add `PullToRefreshSwiftUI` as a dependency in your `Package.swift` manifest:
+
+```swift
+dependencies: [
+  .package(url: "https://github.com/shakurocom/PullToRefreshSwiftUI.git", from: "1.0.0")
+]
+```
 
 ### CocoaPods
 
