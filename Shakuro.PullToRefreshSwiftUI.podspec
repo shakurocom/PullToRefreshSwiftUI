@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
     s.authors          = {'wwwpix' => 'spopov@shakuro.com'}
     s.source           = { :git => 'https://github.com/shakurocom/PullToRefreshSwiftUI.git', :tag => s.version }
     s.swift_versions   = ['5.9']
-    s.source_files     = 'Sources/*'
+    s.source_files     = 'Sources/PullToRefreshSwiftUI/*'
     s.ios.deployment_target = '17.0'
 
 end
