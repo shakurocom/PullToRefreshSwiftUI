@@ -11,4 +11,6 @@ Pod::Spec.new do |s|
     s.source_files     = 'Sources/PullToRefreshSwiftUI/*'
     s.ios.deployment_target = '17.0'
 
+    s.dependency "lottie-ios", "~> 4.4.1"
+
 end
