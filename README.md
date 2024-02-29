@@ -14,6 +14,26 @@ A `PullToRefreshScrollViewSwiftUI` is a custom control that alows to put some co
 
 `PullToRefreshSwiftUI` example:
 
+```swift
+let options = PullToRefreshScrollViewSwiftUIOptions(lottieViewBackgroundColor: .clear,
+                                                    pullingLottieFileName: "animation-pulling-shakuro_logo",
+                                                    refreshingLottieFileName: "animation-refreshing-shakuro_logo")
+PullToRefreshScrollViewSwiftUI(
+    options: options,
+    isRefreshing: $isRefreshing,
+    onRefresh: {
+        debugPrint("Refreshing")
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(5), execute: {
+            isRefreshing = false
+        })
+    },
+    contentViewBuilder: { _ in
+        Rectangle()
+            .fill(.gray)
+            .frame(height: 1000)
+    })
+```
+
 ![](Resources/pull_to_refresh_example_1.gif)
 
 ## Requirements
