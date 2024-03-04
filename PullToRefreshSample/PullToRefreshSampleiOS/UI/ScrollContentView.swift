@@ -23,6 +23,8 @@ struct ScrollContentView: View {
                     .fill(.gray)
                     .frame(height: 1000)
             })
+        .navigationTitle("Scroll View Example")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
 }
