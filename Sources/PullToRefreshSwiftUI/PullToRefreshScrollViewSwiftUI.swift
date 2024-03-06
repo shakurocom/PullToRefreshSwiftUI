@@ -88,6 +88,7 @@ public struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
                     })
                     .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
                     .offset(coordinateSpace: PullToRefreshScrollViewSwiftUIConstant.coordinateSpace, offset: { offset in
+                        print("offset = \(offset)")
                         scrollViewState.contentOffset = offset
                         updateProgressIfNeeded()
                         stopIfNeeded()

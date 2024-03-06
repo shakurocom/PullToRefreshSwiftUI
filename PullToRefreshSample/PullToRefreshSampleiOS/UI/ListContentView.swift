@@ -18,6 +18,8 @@ enum ListContentViewConstant {
 
 struct ListContentView: View {
 
+    @State private var safeAreaTopInset: CGFloat = 0
+
     @State private var items: [ListItem] = [
         ListItem(title: "Item 1"),
         ListItem(title: "Item 2"),
@@ -43,33 +45,33 @@ struct ListContentView: View {
     ]
 
     var body: some View {
-        List {
-            ForEach(items) { (item) in
+        List(content: {
+            Color.red
+                .listRowSeparator(.hidden, edges: .top)
+                .frame(height: 1)
+                .listRowInsets(EdgeInsets())
+                .offset(coordinateSpace: ListContentViewConstant.coordinateSpace, offset: { (offset) in
+                    print("offset = \(offset - safeAreaTopInset)")
+                })
+            // content
+            ForEach(items, content: { (item) in
                 ListContentItemView(listItem: item)
-                    .offset(coordinateSpace: ListContentViewConstant.coordinateSpace, offset: { (offset) in
-                        if item.id == items.first?.id {
-                            print("offset = \(offset)")
-                        }
-                    })
-            }
-            .onDelete { (indexSet) in
+            })
+            .onDelete(perform: { (indexSet) in
                 items.remove(atOffsets: indexSet)
-            }
-            .onMove { (indices, newOffset) in
+            })
+            .onMove(perform: { (indices, newOffset) in
                 items.move(fromOffsets: indices, toOffset: newOffset)
-            }
-        }
-        .background(
-            ZStack{
-                LinearGradient(gradient: Gradient(colors: [Color.black.opacity(0.9),
-                                                           Color.blue.opacity(0.6)]),
-                               startPoint: .top,
-                               endPoint: .bottom)
-            }
-        )
-        .listStyle(PlainListStyle())
+            })
+        })
+        .environment(\.defaultMinListRowHeight, 0)
         .coordinateSpace(name: ListContentViewConstant.coordinateSpace)
+        .listStyle(PlainListStyle())
+        .readSize(onChange: { (data) in
+            safeAreaTopInset = data.safeAreaInsets.top
+        })
         .navigationTitle("Items")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarItems(trailing: EditButton())
     }
 
