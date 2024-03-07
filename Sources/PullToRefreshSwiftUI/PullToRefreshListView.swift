@@ -59,66 +59,94 @@ public struct PullToRefreshListView<ContentViewType: View>: View {
     // MARK: - UI
 
     public var body: some View {
-        let defaultAnimation: Animation = .easeInOut(duration: PullToRefreshListViewOptions.Constant.animationDuration)
         ZStack(alignment: .top, content: {
-            ZStack(alignment: .center, content: {
-                refreshingView()
-                    .frame(height: PullToRefreshListViewConstant.height)
-                    .offset(y: PullToRefreshListViewConstant.offset)
-                    .opacity(scrollViewState.isTriggered ? 1 : 0)
-                    .animation(defaultAnimation, value: scrollViewState.isTriggered)
-                pullingView()
-                    .frame(height: PullToRefreshListViewConstant.height)
-                    .offset(y: PullToRefreshListViewConstant.offset)
-                    .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
-                    .animation(defaultAnimation, value: scrollViewState.isTriggered)
-            })
-            .opacity(isPullToRefreshEnabled ? 1 : 0)
-            GeometryReader(content: { geometryProxy in
-                ScrollView(.vertical, showsIndicators: showsIndicators, content: {
-                    VStack(spacing: 0, content: {
-                        Color.clear
-                            .frame(height: refreshViewHeight * scrollViewState.progress)
-                        if #available(iOS 17.0, *) {
-                            contentViewBuilder(geometryProxy.size)
-                            // https://medium.com/the-swift-cooperative/swiftui-geometrygroup-guide-from-theory-to-practice-1a7f4b04c4ec
-                                .geometryGroup()
-                        } else {
-                            contentViewBuilder(geometryProxy.size)
-                                .transformEffect(.identity)
-                        }
-                    })
-                    .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
-                    .offset(coordinateSpace: PullToRefreshListViewConstant.coordinateSpace, offset: { offset in
-                        print("offset = \(offset)")
-                        scrollViewState.contentOffset = offset
+            Color.yellow
+                .frame(height: refreshViewHeight * scrollViewState.progress)
+            List(content: {
+                Color.red
+                    .listRowSeparator(.hidden, edges: .top)
+                    .frame(height: scrollViewState.isTriggered ? refreshViewHeight : 1)
+                    .listRowInsets(EdgeInsets())
+                    .offset(coordinateSpace: PullToRefreshListViewConstant.coordinateSpace, offset: { (offset) in
+                        let offsetConclusive = offset - safeAreaTopInset
+                        print("offset = \(offsetConclusive)")
+                        scrollViewState.contentOffset = offsetConclusive
                         updateProgressIfNeeded()
                         stopIfNeeded()
                         resetReadyToTriggerIfNeeded()
                         startIfNeeded()
                     })
-                })
-                .scrollClipDisabled(true)
-                .coordinateSpace(name: PullToRefreshListViewConstant.coordinateSpace)
+
+                contentViewBuilder(.zero) // TODO: implement
             })
-            .onChange(of: scrollViewState.isTriggered, { (_, isTriggered) in
-                guard isTriggered else {
-                    return
-                }
-                isRefreshing.wrappedValue = true
-            })
-            .onChange(of: isRefreshing.wrappedValue, { (_, isRefreshing) in
-                if !isRefreshing {
-                    scrollViewState.isRefreshing = false
-                    stopIfNeeded()
-                    resetReadyToTriggerIfNeeded()
-                }
-            })
-            .onChange(of: scrollViewState.isDragging, {
-                stopIfNeeded()
-                resetReadyToTriggerIfNeeded()
-            })
+            .environment(\.defaultMinListRowHeight, 0)
+            .coordinateSpace(name: PullToRefreshListViewConstant.coordinateSpace)
+            .listStyle(PlainListStyle())
         })
+        .readSize(onChange: { (data) in
+            safeAreaTopInset = data.safeAreaInsets.top
+        })
+
+//        let defaultAnimation: Animation = .easeInOut(duration: PullToRefreshListViewOptions.Constant.animationDuration)
+//        ZStack(alignment: .top, content: {
+//            ZStack(alignment: .center, content: {
+//                refreshingView()
+//                    .frame(height: PullToRefreshListViewConstant.height)
+//                    .offset(y: PullToRefreshListViewConstant.offset)
+//                    .opacity(scrollViewState.isTriggered ? 1 : 0)
+//                    .animation(defaultAnimation, value: scrollViewState.isTriggered)
+//                pullingView()
+//                    .frame(height: PullToRefreshListViewConstant.height)
+//                    .offset(y: PullToRefreshListViewConstant.offset)
+//                    .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
+//                    .animation(defaultAnimation, value: scrollViewState.isTriggered)
+//            })
+//            .opacity(isPullToRefreshEnabled ? 1 : 0)
+//            GeometryReader(content: { geometryProxy in
+//                ScrollView(.vertical, showsIndicators: showsIndicators, content: {
+//                    VStack(spacing: 0, content: {
+//                        Color.clear
+//                            .frame(height: refreshViewHeight * scrollViewState.progress)
+//                        if #available(iOS 17.0, *) {
+//                            contentViewBuilder(geometryProxy.size)
+//                            // https://medium.com/the-swift-cooperative/swiftui-geometrygroup-guide-from-theory-to-practice-1a7f4b04c4ec
+//                                .geometryGroup()
+//                        } else {
+//                            contentViewBuilder(geometryProxy.size)
+//                                .transformEffect(.identity)
+//                        }
+//                    })
+//                    .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
+//                    .offset(coordinateSpace: PullToRefreshListViewConstant.coordinateSpace, offset: { offset in
+//                        print("offset = \(offset)")
+//                        scrollViewState.contentOffset = offset
+//                        updateProgressIfNeeded()
+//                        stopIfNeeded()
+//                        resetReadyToTriggerIfNeeded()
+//                        startIfNeeded()
+//                    })
+//                })
+//                .scrollClipDisabled(true)
+//                .coordinateSpace(name: PullToRefreshListViewConstant.coordinateSpace)
+//            })
+//            .onChange(of: scrollViewState.isTriggered, { (_, isTriggered) in
+//                guard isTriggered else {
+//                    return
+//                }
+//                isRefreshing.wrappedValue = true
+//            })
+//            .onChange(of: isRefreshing.wrappedValue, { (_, isRefreshing) in
+//                if !isRefreshing {
+//                    scrollViewState.isRefreshing = false
+//                    stopIfNeeded()
+//                    resetReadyToTriggerIfNeeded()
+//                }
+//            })
+//            .onChange(of: scrollViewState.isDragging, {
+//                stopIfNeeded()
+//                resetReadyToTriggerIfNeeded()
+//            })
+//        })
         .onAppear(perform: {
             scrollViewState.addGestureRecognizer()
         })

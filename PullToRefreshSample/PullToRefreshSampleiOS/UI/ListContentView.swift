@@ -1,3 +1,4 @@
+import PullToRefreshSwiftUI
 import SwiftUI
 
 struct ListItem: Identifiable {
@@ -18,7 +19,7 @@ enum ListContentViewConstant {
 
 struct ListContentView: View {
 
-    @State private var safeAreaTopInset: CGFloat = 0
+    @State private var isRefreshing: Bool = false
 
     @State private var items: [ListItem] = [
         ListItem(title: "Item 1"),
@@ -45,32 +46,56 @@ struct ListContentView: View {
     ]
 
     var body: some View {
-        List(content: {
-            Color.red
-                .listRowSeparator(.hidden, edges: .top)
-                .frame(height: 1)
-                .listRowInsets(EdgeInsets())
-                .offset(coordinateSpace: ListContentViewConstant.coordinateSpace, offset: { (offset) in
-                    print("offset = \(offset - safeAreaTopInset)")
+        let options = PullToRefreshListViewOptions(lottieViewBackgroundColor: .green,
+                                                   pullingLottieFileName: "animation-pulling-shakuro_logo",
+                                                   refreshingLottieFileName: "animation-refreshing-shakuro_logo")
+        PullToRefreshListView(
+            options: options,
+            isRefreshing: $isRefreshing,
+            onRefresh: {
+                debugPrint("Refreshing")
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(5), execute: {
+                    isRefreshing = false
                 })
+            },
+            contentViewBuilder: { _ in
+                ForEach(items, content: { (item) in
+                    ListContentItemView(listItem: item)
+                })
+                .onDelete(perform: { (indexSet) in
+                    items.remove(atOffsets: indexSet)
+                })
+                .onMove(perform: { (indices, newOffset) in
+                    items.move(fromOffsets: indices, toOffset: newOffset)
+                })
+            })
 
-            // content
-            ForEach(items, content: { (item) in
-                ListContentItemView(listItem: item)
-            })
-            .onDelete(perform: { (indexSet) in
-                items.remove(atOffsets: indexSet)
-            })
-            .onMove(perform: { (indices, newOffset) in
-                items.move(fromOffsets: indices, toOffset: newOffset)
-            })
-        })
-        .environment(\.defaultMinListRowHeight, 0)
-        .coordinateSpace(name: ListContentViewConstant.coordinateSpace)
-        .listStyle(PlainListStyle())
-        .readSize(onChange: { (data) in
-            safeAreaTopInset = data.safeAreaInsets.top
-        })
+//        List(content: {
+//            Color.red
+//                .listRowSeparator(.hidden, edges: .top)
+//                .frame(height: 1)
+//                .listRowInsets(EdgeInsets())
+//                .offset(coordinateSpace: ListContentViewConstant.coordinateSpace, offset: { (offset) in
+//                    print("offset = \(offset - safeAreaTopInset)")
+//                })
+//
+//            // content
+//            ForEach(items, content: { (item) in
+//                ListContentItemView(listItem: item)
+//            })
+//            .onDelete(perform: { (indexSet) in
+//                items.remove(atOffsets: indexSet)
+//            })
+//            .onMove(perform: { (indices, newOffset) in
+//                items.move(fromOffsets: indices, toOffset: newOffset)
+//            })
+//        })
+//        .environment(\.defaultMinListRowHeight, 0)
+//        .coordinateSpace(name: ListContentViewConstant.coordinateSpace)
+//        .listStyle(PlainListStyle())
+//        .readSize(onChange: { (data) in
+//            safeAreaTopInset = data.safeAreaInsets.top
+//        })
 
         .navigationTitle("Items")
         .navigationBarTitleDisplayMode(.inline)
