@@ -53,6 +53,7 @@ struct ListContentView: View {
                 .offset(coordinateSpace: ListContentViewConstant.coordinateSpace, offset: { (offset) in
                     print("offset = \(offset - safeAreaTopInset)")
                 })
+
             // content
             ForEach(items, content: { (item) in
                 ListContentItemView(listItem: item)
@@ -70,6 +71,7 @@ struct ListContentView: View {
         .readSize(onChange: { (data) in
             safeAreaTopInset = data.safeAreaInsets.top
         })
+
         .navigationTitle("Items")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarItems(trailing: EditButton())

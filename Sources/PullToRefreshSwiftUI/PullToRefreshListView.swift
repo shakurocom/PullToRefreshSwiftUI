@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct PullToRefreshScrollViewSwiftUIOptions {
+public struct PullToRefreshListViewOptions {
 
     public enum Constant {
         static let animationDuration: TimeInterval = 0.3
@@ -18,15 +18,15 @@ public struct PullToRefreshScrollViewSwiftUIOptions {
 
 }
 
-public enum PullToRefreshScrollViewSwiftUIConstant {
-    public static let coordinateSpace: String = "PullToRefreshScrollViewSwiftUI.CoordinateSpace"
+public enum PullToRefreshListViewConstant {
+    public static let coordinateSpace: String = "PullToRefreshListView.CoordinateSpace"
     public static let height: CGFloat = 100
     public static let offset: CGFloat = 0
 }
 
-public struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
+public struct PullToRefreshListView<ContentViewType: View>: View {
 
-    private let options: PullToRefreshScrollViewSwiftUIOptions
+    private let options: PullToRefreshListViewOptions
     private let refreshViewHeight: CGFloat
     private let showsIndicators: Bool
     private let isPullToRefreshEnabled: Bool
@@ -36,10 +36,12 @@ public struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
 
     @StateObject private var scrollViewState: ScrollViewState = ScrollViewState()
 
+    @State private var safeAreaTopInset: CGFloat = 0
+
     // MARK: - Initialization
 
-    public init(options: PullToRefreshScrollViewSwiftUIOptions,
-                refreshViewHeight: CGFloat = (PullToRefreshScrollViewSwiftUIConstant.offset * 2 + PullToRefreshScrollViewSwiftUIConstant.height),
+    public init(options: PullToRefreshListViewOptions,
+                refreshViewHeight: CGFloat = (PullToRefreshListViewConstant.offset * 2 + PullToRefreshListViewConstant.height),
                 showsIndicators: Bool = true,
                 isPullToRefreshEnabled: Bool = true,
                 isRefreshing: Binding<Bool>,
@@ -57,17 +59,17 @@ public struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
     // MARK: - UI
 
     public var body: some View {
-        let defaultAnimation: Animation = .easeInOut(duration: PullToRefreshScrollViewSwiftUIOptions.Constant.animationDuration)
+        let defaultAnimation: Animation = .easeInOut(duration: PullToRefreshListViewOptions.Constant.animationDuration)
         ZStack(alignment: .top, content: {
             ZStack(alignment: .center, content: {
                 refreshingView()
-                    .frame(height: PullToRefreshScrollViewSwiftUIConstant.height)
-                    .offset(y: PullToRefreshScrollViewSwiftUIConstant.offset)
+                    .frame(height: PullToRefreshListViewConstant.height)
+                    .offset(y: PullToRefreshListViewConstant.offset)
                     .opacity(scrollViewState.isTriggered ? 1 : 0)
                     .animation(defaultAnimation, value: scrollViewState.isTriggered)
                 pullingView()
-                    .frame(height: PullToRefreshScrollViewSwiftUIConstant.height)
-                    .offset(y: PullToRefreshScrollViewSwiftUIConstant.offset)
+                    .frame(height: PullToRefreshListViewConstant.height)
+                    .offset(y: PullToRefreshListViewConstant.offset)
                     .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
                     .animation(defaultAnimation, value: scrollViewState.isTriggered)
             })
@@ -87,7 +89,7 @@ public struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
                         }
                     })
                     .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
-                    .offset(coordinateSpace: PullToRefreshScrollViewSwiftUIConstant.coordinateSpace, offset: { offset in
+                    .offset(coordinateSpace: PullToRefreshListViewConstant.coordinateSpace, offset: { offset in
                         print("offset = \(offset)")
                         scrollViewState.contentOffset = offset
                         updateProgressIfNeeded()
@@ -97,7 +99,7 @@ public struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
                     })
                 })
                 .scrollClipDisabled(true)
-                .coordinateSpace(name: PullToRefreshScrollViewSwiftUIConstant.coordinateSpace)
+                .coordinateSpace(name: PullToRefreshListViewConstant.coordinateSpace)
             })
             .onChange(of: scrollViewState.isTriggered, { (_, isTriggered) in
                 guard isTriggered else {
@@ -184,13 +186,13 @@ public struct PullToRefreshScrollViewSwiftUI<ContentViewType: View>: View {
 
 // MARK: - Preview
 
-struct PullToRefreshScrollViewSwiftUI_Previews: PreviewProvider {
+struct PullToRefreshListView_Previews: PreviewProvider {
 
     static var previews: some View {
-        let options = PullToRefreshScrollViewSwiftUIOptions(lottieViewBackgroundColor: .green,
-                                                            pullingLottieFileName: "animation-pulling-shakuro_logo",
-                                                            refreshingLottieFileName: "animation-refreshing-shakuro_logo")
-        PullToRefreshScrollViewSwiftUI(
+        let options = PullToRefreshListViewOptions(lottieViewBackgroundColor: .green,
+                                                   pullingLottieFileName: "animation-pulling-shakuro_logo",
+                                                   refreshingLottieFileName: "animation-refreshing-shakuro_logo")
+        PullToRefreshListView(
             options: options,
             isRefreshing: .constant(true),
             onRefresh: {

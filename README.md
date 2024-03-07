@@ -10,15 +10,15 @@
 - [Usage](#usage)
 - [License](#license)
 
-A `PullToRefreshScrollViewSwiftUI` is a custom control that alows to put some content on scroll view with pull to refresh action.
+A `PullToRefreshScrollView` is a custom control that alows to put some content on scroll view with pull to refresh action.
 
-`PullToRefreshScrollViewSwiftUI` example:
+`PullToRefreshScrollView` example:
 
 ```swift
-let options = PullToRefreshScrollViewSwiftUIOptions(lottieViewBackgroundColor: .clear,
-                                                    pullingLottieFileName: "animation-pulling-shakuro_logo",
-                                                    refreshingLottieFileName: "animation-refreshing-shakuro_logo")
-PullToRefreshScrollViewSwiftUI(
+let options = PullToRefreshScrollViewOptions(lottieViewBackgroundColor: .clear,
+                                             pullingLottieFileName: "animation-pulling-shakuro_logo",
+                                             refreshingLottieFileName: "animation-refreshing-shakuro_logo")
+PullToRefreshScrollView(
     options: options,
     isRefreshing: $isRefreshing,
     onRefresh: {
