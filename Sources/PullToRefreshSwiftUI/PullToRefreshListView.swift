@@ -169,9 +169,13 @@ public struct PullToRefreshListView<ContentViewType: View>: View {
     }
 
     private func stopIfNeeded() {
-        if !scrollViewState.isRefreshing && !scrollViewState.isDragging && scrollViewState.isTriggered {
-            scrollViewState.progress = 0
-            scrollViewState.isTriggered = false
+        if !scrollViewState.isRefreshing && !scrollViewState.isDragging {
+            if scrollViewState.progress > 0 {
+                scrollViewState.progress = 0
+            }
+            if scrollViewState.isTriggered {
+                scrollViewState.isTriggered = false
+            }
         }
     }
 
@@ -190,7 +194,6 @@ public struct PullToRefreshListView<ContentViewType: View>: View {
         if !scrollViewState.isTriggered && !scrollViewState.isRefreshing && scrollViewState.isReadyToTrigger {
             // initial pulling will increase progress to 1; then when drag finished or
             // fetch finished stopIfNeeded() will be called where progress will be set to 0.
-            // isRefreshing check is here because we need to remove conflict between setting progress.
             scrollViewState.progress = min(max(scrollViewState.contentOffset / refreshViewHeight, 0), 1)
         }
     }
