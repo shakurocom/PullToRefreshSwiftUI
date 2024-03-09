@@ -88,7 +88,7 @@ public struct PullToRefreshScrollView<ContentViewType: View>: View {
                     })
                     .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
                     .offset(coordinateSpace: PullToRefreshScrollViewConstant.coordinateSpace, offset: { offset in
-                        print("offset = \(offset)")
+                        print("offset = \(offset)") // TODO: implement
                         scrollViewState.contentOffset = offset
                         updateProgressIfNeeded()
                         stopIfNeeded()
@@ -96,25 +96,8 @@ public struct PullToRefreshScrollView<ContentViewType: View>: View {
                         startIfNeeded()
                     })
                 })
-                .scrollClipDisabled(true)
+                .scrollClipDisabled(true) // TODO: implement
                 .coordinateSpace(name: PullToRefreshScrollViewConstant.coordinateSpace)
-            })
-            .onChange(of: scrollViewState.isTriggered, { (_, isTriggered) in
-                guard isTriggered else {
-                    return
-                }
-                isRefreshing.wrappedValue = true
-            })
-            .onChange(of: isRefreshing.wrappedValue, { (_, isRefreshing) in
-                if !isRefreshing {
-                    scrollViewState.isRefreshing = false
-                    stopIfNeeded()
-                    resetReadyToTriggerIfNeeded()
-                }
-            })
-            .onChange(of: scrollViewState.isDragging, {
-                stopIfNeeded()
-                resetReadyToTriggerIfNeeded()
             })
         })
         .onAppear(perform: {
@@ -122,6 +105,23 @@ public struct PullToRefreshScrollView<ContentViewType: View>: View {
         })
         .onDisappear(perform: {
             scrollViewState.removeGestureRecognizer()
+        })
+        .onChange(of: scrollViewState.isTriggered, { (_, isTriggered) in
+            guard isTriggered else {
+                return
+            }
+            isRefreshing.wrappedValue = true
+        })
+        .onChange(of: isRefreshing.wrappedValue, { (_, isRefreshing) in
+            if !isRefreshing {
+                scrollViewState.isRefreshing = false
+                stopIfNeeded()
+                resetReadyToTriggerIfNeeded()
+            }
+        })
+        .onChange(of: scrollViewState.isDragging, {
+            stopIfNeeded()
+            resetReadyToTriggerIfNeeded()
         })
     }
 

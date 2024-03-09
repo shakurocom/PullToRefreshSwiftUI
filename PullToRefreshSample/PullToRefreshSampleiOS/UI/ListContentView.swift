@@ -46,7 +46,7 @@ struct ListContentView: View {
     ]
 
     var body: some View {
-        let options = PullToRefreshListViewOptions(lottieViewBackgroundColor: .green,
+        let options = PullToRefreshListViewOptions(lottieViewBackgroundColor: .clear,
                                                    pullingLottieFileName: "animation-pulling-shakuro_logo",
                                                    refreshingLottieFileName: "animation-refreshing-shakuro_logo")
         PullToRefreshListView(
@@ -69,67 +69,9 @@ struct ListContentView: View {
                     items.move(fromOffsets: indices, toOffset: newOffset)
                 })
             })
-
-//        List(content: {
-//            Color.red
-//                .listRowSeparator(.hidden, edges: .top)
-//                .frame(height: 1)
-//                .listRowInsets(EdgeInsets())
-//                .offset(coordinateSpace: ListContentViewConstant.coordinateSpace, offset: { (offset) in
-//                    print("offset = \(offset - safeAreaTopInset)")
-//                })
-//
-//            // content
-//            ForEach(items, content: { (item) in
-//                ListContentItemView(listItem: item)
-//            })
-//            .onDelete(perform: { (indexSet) in
-//                items.remove(atOffsets: indexSet)
-//            })
-//            .onMove(perform: { (indices, newOffset) in
-//                items.move(fromOffsets: indices, toOffset: newOffset)
-//            })
-//        })
-//        .environment(\.defaultMinListRowHeight, 0)
-//        .coordinateSpace(name: ListContentViewConstant.coordinateSpace)
-//        .listStyle(PlainListStyle())
-//        .readSize(onChange: { (data) in
-//            safeAreaTopInset = data.safeAreaInsets.top
-//        })
-
         .navigationTitle("Items")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarItems(trailing: EditButton())
-    }
-
-}
-
-private struct ScrollViewOffsetPreferenceKey: PreferenceKey {
-
-    static var defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-
-}
-
-private extension View {
-
-    @ViewBuilder
-    func offset(coordinateSpace: String, offset: @escaping (CGFloat) -> Void) -> some View {
-        self
-            .background {
-                GeometryReader(content: { geometryProxy in
-                    let minY = geometryProxy.frame(in: .named(coordinateSpace)).minY
-                    Color.clear
-                        .preference(key: ScrollViewOffsetPreferenceKey.self, value: minY)
-                        .onPreferenceChange(ScrollViewOffsetPreferenceKey.self, perform: { value in
-                            offset(value)
-                        })
-
-                })
-            }
     }
 
 }
