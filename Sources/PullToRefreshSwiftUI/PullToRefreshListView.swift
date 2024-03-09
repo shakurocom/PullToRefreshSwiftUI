@@ -84,20 +84,17 @@ public struct PullToRefreshListView<ContentViewType: View>: View {
                         .frame(height: refreshViewHeight * scrollViewState.progress)
                     List(content: {
                         // view for offset calculation
-                        Color.red // TODO: implement
+                        Color.clear
                             .listRowSeparator(.hidden, edges: .top)
-                            .frame(height: 1) // TODO: implement
+                            .frame(height: 0)
                             .listRowInsets(EdgeInsets())
                             .offset(coordinateSpace: PullToRefreshListViewConstant.coordinateSpace, offset: { (offset) in
                                 let offsetConclusive = offset - safeAreaTopInset
-                                print("offset = \(offsetConclusive)") // TODO: implement
-                                print("1 progress = \(scrollViewState.progress)") // TODO: implement
                                 scrollViewState.contentOffset = offsetConclusive
                                 updateProgressIfNeeded()
                                 stopIfNeeded()
                                 resetReadyToTriggerIfNeeded()
                                 startIfNeeded()
-                                print("2 progress = \(scrollViewState.progress)") // TODO: implement
                             })
                         if #available(iOS 17.0, *) {
                             contentViewBuilder(geometryProxy.size)
@@ -290,38 +287,6 @@ private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDe
 
     private func getRootViewController() -> UIViewController? {
         return (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.windows.first?.rootViewController
-    }
-
-}
-
-// MARK: - ScrollView Offset
-
-private struct ScrollViewOffsetPreferenceKey: PreferenceKey {
-
-    static var defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-
-}
-
-private extension View {
-
-    @ViewBuilder
-    func offset(coordinateSpace: String, offset: @escaping (CGFloat) -> Void) -> some View {
-        self
-            .background {
-                GeometryReader(content: { geometryProxy in
-                    let minY = geometryProxy.frame(in: .named(coordinateSpace)).minY
-                    Color.clear
-                        .preference(key: ScrollViewOffsetPreferenceKey.self, value: minY)
-                        .onPreferenceChange(ScrollViewOffsetPreferenceKey.self, perform: { value in
-                            offset(value)
-                        })
-
-                })
-            }
     }
 
 }

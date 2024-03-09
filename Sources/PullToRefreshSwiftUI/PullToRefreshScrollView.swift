@@ -88,7 +88,6 @@ public struct PullToRefreshScrollView<ContentViewType: View>: View {
                     })
                     .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
                     .offset(coordinateSpace: PullToRefreshScrollViewConstant.coordinateSpace, offset: { offset in
-                        print("offset = \(offset)") // TODO: implement
                         scrollViewState.contentOffset = offset
                         updateProgressIfNeeded()
                         stopIfNeeded()
@@ -96,7 +95,6 @@ public struct PullToRefreshScrollView<ContentViewType: View>: View {
                         startIfNeeded()
                     })
                 })
-                .scrollClipDisabled(true) // TODO: implement
                 .coordinateSpace(name: PullToRefreshScrollViewConstant.coordinateSpace)
             })
         })
@@ -272,38 +270,6 @@ private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDe
 
     private func getRootViewController() -> UIViewController? {
         return (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.windows.first?.rootViewController
-    }
-
-}
-
-// MARK: - ScrollView Offset
-
-private struct ScrollViewOffsetPreferenceKey: PreferenceKey {
-
-    static var defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-
-}
-
-private extension View {
-
-    @ViewBuilder
-    func offset(coordinateSpace: String, offset: @escaping (CGFloat) -> Void) -> some View {
-        self
-            .background {
-                GeometryReader(content: { geometryProxy in
-                    let minY = geometryProxy.frame(in: .named(coordinateSpace)).minY
-                    Color.clear
-                        .preference(key: ScrollViewOffsetPreferenceKey.self, value: minY)
-                        .onPreferenceChange(ScrollViewOffsetPreferenceKey.self, perform: { value in
-                            offset(value)
-                        })
-
-                })
-            }
     }
 
 }
