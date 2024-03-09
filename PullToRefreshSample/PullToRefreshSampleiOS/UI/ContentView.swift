@@ -1,5 +1,6 @@
 import SwiftUI
 
+@available(iOS 17.0, *)
 struct ContentView: View {
 
     private enum Option {
@@ -41,5 +42,9 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    if #available(iOS 17.0, *) {
+        ContentView()
+    } else {
+        Color.red // TODO: implement
+    }
 }

@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
     s.source           = { :git => 'https://github.com/shakurocom/PullToRefreshSwiftUI.git', :tag => s.version }
     s.swift_versions   = ['5.9']
     s.source_files     = 'Sources/PullToRefreshSwiftUI/*'
-    s.ios.deployment_target = '17.0'
+    s.ios.deployment_target = '15.0'
 
     s.dependency "lottie-ios", "~> 4.4.1"
 

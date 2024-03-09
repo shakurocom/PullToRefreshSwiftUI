@@ -121,20 +121,20 @@ public struct PullToRefreshListView<ContentViewType: View>: View {
         .onDisappear(perform: {
             scrollViewState.removeGestureRecognizer()
         })
-        .onChange(of: scrollViewState.isTriggered, { (_, isTriggered) in
+        .onChange(of: scrollViewState.isTriggered, perform: { (isTriggered) in
             guard isTriggered else {
                 return
             }
             isRefreshing.wrappedValue = true
         })
-        .onChange(of: isRefreshing.wrappedValue, { (_, isRefreshing) in
+        .onChange(of: isRefreshing.wrappedValue, perform: { (isRefreshing) in
             if !isRefreshing {
                 scrollViewState.isRefreshing = false
                 stopIfNeeded()
                 resetReadyToTriggerIfNeeded()
             }
         })
-        .onChange(of: scrollViewState.isDragging, {
+        .onChange(of: scrollViewState.isDragging, perform: { (_) in
             stopIfNeeded()
             resetReadyToTriggerIfNeeded()
         })
