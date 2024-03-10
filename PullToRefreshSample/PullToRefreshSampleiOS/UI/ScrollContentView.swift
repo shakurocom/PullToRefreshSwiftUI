@@ -1,3 +1,4 @@
+import Lottie
 import PullToRefreshSwiftUI
 import SwiftUI
 
@@ -17,12 +18,12 @@ struct ScrollContentView: View {
                 })
             },
             pullingViewBuilder: { (progress) in
-                let options = LottieViewSwiftUIOptions(lottieFileName: "animation-pulling-shakuro_logo", backgroundColor: .clear)
-                LottieViewSwiftUI(options: options, isPlaying: nil, currentProgress: .constant(progress))
+                LottieView(animation: .named("animation-pulling-shakuro_logo"))
+                    .playbackMode(.paused(at: .progress(progress)))
             },
             refreshingViewBuilder: { (isTriggered) in
-                let options = LottieViewSwiftUIOptions(lottieFileName: "animation-refreshing-shakuro_logo", backgroundColor: .clear)
-                LottieViewSwiftUI(options: options, isPlaying: .constant(isTriggered), currentProgress: nil)
+                LottieView(animation: .named("animation-refreshing-shakuro_logo"))
+                    .playbackMode(isTriggered ? .playing(.fromProgress(0, toProgress: 1, loopMode: .loop)) : .paused)
             },
             contentViewBuilder: { _ in
                 Rectangle()
