@@ -14,6 +14,7 @@
 		A56DF71D2B852C2C00477FBD /* PullToRefreshSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A56DF71C2B852C2C00477FBD /* PullToRefreshSwiftUI */; };
 		A5BA6BAD2B870CEE00DAE39C /* ScrollContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5BA6BAC2B870CEE00DAE39C /* ScrollContentView.swift */; };
 		A5BA6BAF2B870D0100DAE39C /* ListContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5BA6BAE2B870D0100DAE39C /* ListContentView.swift */; };
+		A5D2E8062B9E31920079FD9B /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = A5D2E8052B9E31920079FD9B /* Lottie */; };
 		A5DD89652B8867C600EF70A5 /* animation-refreshing-shakuro_logo.json in Resources */ = {isa = PBXBuildFile; fileRef = A5DD89632B8867C600EF70A5 /* animation-refreshing-shakuro_logo.json */; };
 		A5DD89662B8867C600EF70A5 /* animation-pulling-shakuro_logo.json in Resources */ = {isa = PBXBuildFile; fileRef = A5DD89642B8867C600EF70A5 /* animation-pulling-shakuro_logo.json */; };
 		A5E2D0A22B9DE74300911851 /* LottieViewSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E2D0A12B9DE74300911851 /* LottieViewSwiftUI.swift */; };
@@ -39,6 +40,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A56DF71D2B852C2C00477FBD /* PullToRefreshSwiftUI in Frameworks */,
+				A5D2E8062B9E31920079FD9B /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,6 +138,7 @@
 			name = PullToRefreshSample;
 			packageProductDependencies = (
 				A56DF71C2B852C2C00477FBD /* PullToRefreshSwiftUI */,
+				A5D2E8052B9E31920079FD9B /* Lottie */,
 			);
 			productName = PullToRefreshSample;
 			productReference = A51D6A4B2B83DE8000E44E19 /* PullToRefreshSample.app */;
@@ -165,6 +168,9 @@
 				Base,
 			);
 			mainGroup = A51D6A422B83DE8000E44E19;
+			packageReferences = (
+				A5D2E8042B9E31920079FD9B /* XCRemoteSwiftPackageReference "lottie-spm" */,
+			);
 			productRefGroup = A51D6A4C2B83DE8000E44E19 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -404,10 +410,26 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		A5D2E8042B9E31920079FD9B /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.4.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		A56DF71C2B852C2C00477FBD /* PullToRefreshSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PullToRefreshSwiftUI;
+		};
+		A5D2E8052B9E31920079FD9B /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A5D2E8042B9E31920079FD9B /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
