@@ -2,18 +2,10 @@ import SwiftUI
 
 public struct PullToRefreshScrollViewOptions {
 
-    public enum Constant {
-        static let animationDuration: TimeInterval = 0.3
-    }
+    public let animationDuration: TimeInterval
 
-    public let lottieViewBackgroundColor: UIColor
-    public let pullingLottieFileName: String
-    public let refreshingLottieFileName: String
-
-    public init(lottieViewBackgroundColor: UIColor, pullingLottieFileName: String, refreshingLottieFileName: String) {
-        self.lottieViewBackgroundColor = lottieViewBackgroundColor
-        self.pullingLottieFileName = pullingLottieFileName
-        self.refreshingLottieFileName = refreshingLottieFileName
+    public init(animationDuration: TimeInterval = 0.3) {
+        self.animationDuration = animationDuration
     }
 
 }
@@ -24,7 +16,7 @@ public enum PullToRefreshScrollViewConstant {
     public static let offset: CGFloat = 0
 }
 
-public struct PullToRefreshScrollView<ContentViewType: View>: View {
+public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType: View, ContentViewType: View>: View {
 
     private let options: PullToRefreshScrollViewOptions
     private let refreshViewHeight: CGFloat
@@ -32,6 +24,8 @@ public struct PullToRefreshScrollView<ContentViewType: View>: View {
     private let isPullToRefreshEnabled: Bool
     private let isRefreshing: Binding<Bool>
     private let onRefresh: () -> Void
+    private let pullingViewBuilder: (_ progress: CGFloat) -> PullingViewType
+    private let refreshingViewBuilder: (_ isTriggered: Bool) -> RefreshingViewType
     private let contentViewBuilder: (_ scrollViewSize: CGSize) -> ContentViewType
 
     @StateObject private var scrollViewState: ScrollViewState = ScrollViewState()
@@ -44,6 +38,8 @@ public struct PullToRefreshScrollView<ContentViewType: View>: View {
                 isPullToRefreshEnabled: Bool = true,
                 isRefreshing: Binding<Bool>,
                 onRefresh: @escaping () -> Void,
+                @ViewBuilder pullingViewBuilder: @escaping (_ progress: CGFloat) -> PullingViewType,
+                @ViewBuilder refreshingViewBuilder: @escaping (_ isTriggered: Bool) -> RefreshingViewType,
                 @ViewBuilder contentViewBuilder: @escaping (_ scrollViewSize: CGSize) -> ContentViewType) {
         self.options = options
         self.refreshViewHeight = refreshViewHeight
@@ -51,24 +47,26 @@ public struct PullToRefreshScrollView<ContentViewType: View>: View {
         self.isPullToRefreshEnabled = isPullToRefreshEnabled
         self.isRefreshing = isRefreshing
         self.onRefresh = onRefresh
+        self.pullingViewBuilder = pullingViewBuilder
+        self.refreshingViewBuilder = refreshingViewBuilder
         self.contentViewBuilder = contentViewBuilder
     }
 
     // MARK: - UI
 
     public var body: some View {
-        let defaultAnimation: Animation = .easeInOut(duration: PullToRefreshScrollViewOptions.Constant.animationDuration)
+        let defaultAnimation: Animation = .easeInOut(duration: options.animationDuration)
         ZStack(alignment: .top, content: {
             ZStack(alignment: .center, content: {
-                refreshingView()
-                    .frame(height: PullToRefreshScrollViewConstant.height)
-                    .offset(y: PullToRefreshScrollViewConstant.offset)
-                    .opacity(scrollViewState.isTriggered ? 1 : 0)
-                    .animation(defaultAnimation, value: scrollViewState.isTriggered)
-                pullingView()
-                    .frame(height: PullToRefreshScrollViewConstant.height)
+                pullingViewBuilder(scrollViewState.progress)
+                    .frame(height: PullToRefreshScrollViewConstant.height) // TODO: implement
                     .offset(y: PullToRefreshScrollViewConstant.offset)
                     .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
+                    .animation(defaultAnimation, value: scrollViewState.isTriggered)
+                refreshingViewBuilder(scrollViewState.isTriggered)
+                    .frame(height: PullToRefreshScrollViewConstant.height) // TODO: implement
+                    .offset(y: PullToRefreshScrollViewConstant.offset)
+                    .opacity(scrollViewState.isTriggered ? 1 : 0)
                     .animation(defaultAnimation, value: scrollViewState.isTriggered)
             })
             .opacity(isPullToRefreshEnabled ? 1 : 0)
@@ -125,16 +123,6 @@ public struct PullToRefreshScrollView<ContentViewType: View>: View {
 
     // MARK: - Private
 
-    private func pullingView() -> some View {
-        let options = LottieViewSwiftUIOptions(lottieFileName: options.pullingLottieFileName, backgroundColor: options.lottieViewBackgroundColor)
-        return LottieViewSwiftUI(options: options, isPlaying: nil, currentProgress: $scrollViewState.progress)
-    }
-
-    private func refreshingView() -> some View {
-        let options = LottieViewSwiftUIOptions(lottieFileName: options.refreshingLottieFileName, backgroundColor: options.lottieViewBackgroundColor)
-        return LottieViewSwiftUI(options: options, isPlaying: $scrollViewState.isTriggered, currentProgress: nil)
-    }
-
     private func startIfNeeded() {
         if isPullToRefreshEnabled,
            scrollViewState.contentOffset > refreshViewHeight,
@@ -182,25 +170,26 @@ public struct PullToRefreshScrollView<ContentViewType: View>: View {
 
 // MARK: - Preview
 
-struct PullToRefreshScrollView_Previews: PreviewProvider {
-
-    static var previews: some View {
-        let options = PullToRefreshScrollViewOptions(lottieViewBackgroundColor: .green,
-                                                     pullingLottieFileName: "animation-pulling-shakuro_logo",
-                                                     refreshingLottieFileName: "animation-refreshing-shakuro_logo")
-        PullToRefreshScrollView(
-            options: options,
-            isRefreshing: .constant(true),
-            onRefresh: {
-                debugPrint("Refreshing")
-            },
-            contentViewBuilder: { _ in
-                Rectangle()
-                    .fill(.red)
-                    .frame(height: 1000)
-            })
-    }
-}
+// TODO: implement
+//struct PullToRefreshScrollView_Previews: PreviewProvider {
+//
+//    static var previews: some View {
+//        let options = PullToRefreshScrollViewOptions(lottieViewBackgroundColor: .green,
+//                                                     pullingLottieFileName: "animation-pulling-shakuro_logo",
+//                                                     refreshingLottieFileName: "animation-refreshing-shakuro_logo")
+//        PullToRefreshScrollView(
+//            options: options,
+//            isRefreshing: .constant(true),
+//            onRefresh: {
+//                debugPrint("Refreshing")
+//            },
+//            contentViewBuilder: { _ in
+//                Rectangle()
+//                    .fill(.red)
+//                    .frame(height: 1000)
+//            })
+//    }
+//}
 
 // MARK: - ScrollViewState
 

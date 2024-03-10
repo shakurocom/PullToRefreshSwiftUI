@@ -46,9 +46,7 @@ struct ListContentView: View {
     ]
 
     var body: some View {
-        let options = PullToRefreshListViewOptions(lottieViewBackgroundColor: .clear,
-                                                   pullingLottieFileName: "animation-pulling-shakuro_logo",
-                                                   refreshingLottieFileName: "animation-refreshing-shakuro_logo")
+        let options = PullToRefreshListViewOptions()
         PullToRefreshListView(
             options: options,
             isRefreshing: $isRefreshing,
@@ -57,6 +55,14 @@ struct ListContentView: View {
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(5), execute: {
                     isRefreshing = false
                 })
+            },
+            pullingViewBuilder: { (progress) in
+                let options = LottieViewSwiftUIOptions(lottieFileName: "animation-pulling-shakuro_logo", backgroundColor: .clear)
+                LottieViewSwiftUI(options: options, isPlaying: nil, currentProgress: .constant(progress))
+            },
+            refreshingViewBuilder: { (isTriggered) in
+                let options = LottieViewSwiftUIOptions(lottieFileName: "animation-refreshing-shakuro_logo", backgroundColor: .clear)
+                LottieViewSwiftUI(options: options, isPlaying: .constant(isTriggered), currentProgress: nil)
             },
             contentViewBuilder: { _ in
                 ForEach(items, content: { (item) in

@@ -14,12 +14,11 @@ let package = Package(
             targets: ["PullToRefreshSwiftUI"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/airbnb/lottie-spm.git", from: "4.4.0")
     ],
     targets: [
         .target(
             name: "PullToRefreshSwiftUI",
-            dependencies: [.product(name: "Lottie", package: "lottie-spm")]),
+            dependencies: []),
         .testTarget(
             name: "PullToRefreshSwiftUITests",
             dependencies: ["PullToRefreshSwiftUI"]),

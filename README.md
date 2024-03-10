@@ -15,10 +15,10 @@ A `PullToRefreshScrollView` is a custom control that alows to put some content o
 `PullToRefreshScrollView` example:
 
 ```swift
-let options = PullToRefreshScrollViewOptions(lottieViewBackgroundColor: .clear,
+let options = PullToRefreshScrollViewOptions(lottieViewBackgroundColor: .clear, // TODO: implement
                                              pullingLottieFileName: "animation-pulling-shakuro_logo",
                                              refreshingLottieFileName: "animation-refreshing-shakuro_logo")
-PullToRefreshScrollView(
+PullToRefreshScrollView( // TODO: implement
     options: options,
     isRefreshing: $isRefreshing,
     onRefresh: {

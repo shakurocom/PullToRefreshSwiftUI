@@ -2,7 +2,7 @@
 //
 //
 
-import Lottie // TODO: implement - remove dependency and add content builders
+import Lottie // TODO: implement - use native LottieView
 import SwiftUI
 
 // TODO: implement - use SwiftUI LottieView
