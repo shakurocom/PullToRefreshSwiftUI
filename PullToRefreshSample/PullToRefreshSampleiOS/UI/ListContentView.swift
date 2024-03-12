@@ -55,6 +55,7 @@ struct ListContentView: View {
                 debugPrint("Refreshing")
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(5), execute: {
                     isRefreshing = false
+                    items.shuffle()
                 })
             },
             pullingViewBuilder: { (progress) in

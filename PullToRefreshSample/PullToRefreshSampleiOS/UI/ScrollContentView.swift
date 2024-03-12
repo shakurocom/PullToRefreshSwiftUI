@@ -26,6 +26,9 @@ struct ScrollContentView: View {
 //                    .frame(width: 100, height: 100)
 //                    .rotationEffect(Angle(degrees: 270))
 
+//                ProgressView(value: progress, total: 1)
+//                    .progressViewStyle(.linear)
+
                 // TODO: implement
                 LottieView(animation: .named("animation-pulling-shakuro_logo"))
                     .playbackMode(.paused(at: .progress(progress)))
@@ -42,14 +45,23 @@ struct ScrollContentView: View {
 //                        rotationDegrees = 360
 //                    })
 
+//                ProgressView()
+//                    .progressViewStyle(.circular)
+
                 // TODO: implement
                 LottieView(animation: .named("animation-refreshing-shakuro_logo"))
                     .playbackMode(isTriggered ? .playing(.fromProgress(0, toProgress: 1, loopMode: .loop)) : .paused)
             },
             contentViewBuilder: { _ in
-                Rectangle()
-                    .fill(.gray)
-                    .frame(height: 1000)
+                VStack(content: {
+                    Text(isRefreshing ? "Refreshing" : "Idle")
+                        .font(.largeTitle)
+                        .foregroundStyle(isRefreshing ? .white : .black)
+                        .padding(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+                    Color.clear
+                })
+                .background(Color(isRefreshing ? .darkGray : .lightGray))
+                .frame(height: 1000)
             })
         .navigationTitle("Scroll View Example")
         .navigationBarTitleDisplayMode(.inline)
