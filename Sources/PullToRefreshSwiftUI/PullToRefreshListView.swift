@@ -60,17 +60,20 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
         let defaultAnimation: Animation = .easeInOut(duration: options.animationDuration)
         ZStack(alignment: .top, content: {
             // animations
-            ZStack(alignment: .center, content: {
-                pullingViewBuilder(scrollViewState.progress)
-                    .frame(height: PullToRefreshListViewConstant.height) // TODO: implement
-                    .offset(y: PullToRefreshListViewConstant.offset)
-                    .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
-                    .animation(defaultAnimation, value: scrollViewState.isTriggered)
-                refreshingViewBuilder(scrollViewState.isTriggered)
-                    .frame(height: PullToRefreshListViewConstant.height) // TODO: implement
-                    .offset(y: PullToRefreshListViewConstant.offset)
-                    .opacity(scrollViewState.isTriggered ? 1 : 0)
-                    .animation(defaultAnimation, value: scrollViewState.isTriggered)
+            VStack(spacing: 0, content: {
+                ZStack(alignment: .center, content: {
+                    pullingViewBuilder(scrollViewState.progress)
+                        .modifier(GeometryGroupModifier())
+                        .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
+                        .animation(defaultAnimation, value: scrollViewState.isTriggered)
+                    refreshingViewBuilder(scrollViewState.isTriggered)
+                        .modifier(GeometryGroupModifier())
+                        .opacity(scrollViewState.isTriggered ? 1 : 0)
+                        .animation(defaultAnimation, value: scrollViewState.isTriggered)
+                })
+                .frame(height: PullToRefreshScrollViewConstant.height) // TODO: implement
+                .offset(y: PullToRefreshScrollViewConstant.offset) // TODO: implement
+                Color.clear
             })
             .opacity(isPullToRefreshEnabled ? 1 : 0)
             // List content
@@ -94,14 +97,8 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
                                 resetReadyToTriggerIfNeeded()
                                 startIfNeeded()
                             })
-                        if #available(iOS 17.0, *) {
-                            contentViewBuilder(geometryProxy.size)
-                            // https://medium.com/the-swift-cooperative/swiftui-geometrygroup-guide-from-theory-to-practice-1a7f4b04c4ec
-                                .geometryGroup()
-                        } else {
-                            contentViewBuilder(geometryProxy.size)
-                                .transformEffect(.identity)
-                        }
+                        contentViewBuilder(geometryProxy.size)
+                            .modifier(GeometryGroupModifier())
                     })
                     .environment(\.defaultMinListRowHeight, 0)
                     .coordinateSpace(name: PullToRefreshListViewConstant.coordinateSpace)

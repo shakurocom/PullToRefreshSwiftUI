@@ -57,32 +57,31 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
     public var body: some View {
         let defaultAnimation: Animation = .easeInOut(duration: options.animationDuration)
         ZStack(alignment: .top, content: {
-            ZStack(alignment: .center, content: {
-                pullingViewBuilder(scrollViewState.progress)
-                    .frame(height: PullToRefreshScrollViewConstant.height) // TODO: implement
-                    .offset(y: PullToRefreshScrollViewConstant.offset)
-                    .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
-                    .animation(defaultAnimation, value: scrollViewState.isTriggered)
-                refreshingViewBuilder(scrollViewState.isTriggered)
-                    .frame(height: PullToRefreshScrollViewConstant.height) // TODO: implement
-                    .offset(y: PullToRefreshScrollViewConstant.offset)
-                    .opacity(scrollViewState.isTriggered ? 1 : 0)
-                    .animation(defaultAnimation, value: scrollViewState.isTriggered)
+            // animations
+            VStack(spacing: 0, content: {
+                ZStack(alignment: .center, content: {
+                    pullingViewBuilder(scrollViewState.progress)
+                        .modifier(GeometryGroupModifier())
+                        .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
+                        .animation(defaultAnimation, value: scrollViewState.isTriggered)
+                    refreshingViewBuilder(scrollViewState.isTriggered)
+                        .modifier(GeometryGroupModifier())
+                        .opacity(scrollViewState.isTriggered ? 1 : 0)
+                        .animation(defaultAnimation, value: scrollViewState.isTriggered)
+                })
+                .frame(height: PullToRefreshScrollViewConstant.height) // TODO: implement
+                .offset(y: PullToRefreshScrollViewConstant.offset) // TODO: implement
+                Color.clear
             })
             .opacity(isPullToRefreshEnabled ? 1 : 0)
+            // Scroll content
             GeometryReader(content: { geometryProxy in
                 ScrollView(.vertical, showsIndicators: showsIndicators, content: {
                     VStack(spacing: 0, content: {
                         Color.clear
                             .frame(height: refreshViewHeight * scrollViewState.progress)
-                        if #available(iOS 17.0, *) {
-                            contentViewBuilder(geometryProxy.size)
-                            // https://medium.com/the-swift-cooperative/swiftui-geometrygroup-guide-from-theory-to-practice-1a7f4b04c4ec
-                                .geometryGroup()
-                        } else {
-                            contentViewBuilder(geometryProxy.size)
-                                .transformEffect(.identity)
-                        }
+                        contentViewBuilder(geometryProxy.size)
+                            .modifier(GeometryGroupModifier())
                     })
                     .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
                     .offset(coordinateSpace: PullToRefreshScrollViewConstant.coordinateSpace, offset: { offset in
