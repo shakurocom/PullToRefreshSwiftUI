@@ -65,11 +65,9 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
                     pullingViewBuilder(scrollViewState.progress)
                         .modifier(GeometryGroupModifier())
                         .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
-                        .animation(defaultAnimation, value: scrollViewState.isTriggered)
                     refreshingViewBuilder(scrollViewState.isTriggered)
                         .modifier(GeometryGroupModifier())
                         .opacity(scrollViewState.isTriggered ? 1 : 0)
-                        .animation(defaultAnimation, value: scrollViewState.isTriggered)
                 })
                 .frame(height: PullToRefreshScrollViewConstant.height) // TODO: implement
                 .offset(y: PullToRefreshScrollViewConstant.offset) // TODO: implement
