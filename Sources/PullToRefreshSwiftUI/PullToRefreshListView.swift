@@ -16,13 +16,15 @@ public enum PullToRefreshListViewConstant { // TODO: implement
     public static let offset: CGFloat = 0
 }
 
-public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: View, ContentViewType: View>: View {
+public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: View, ContentViewType: View, Style: ListStyle>: View {
 
     private let options: PullToRefreshListViewOptions
     private let refreshViewHeight: CGFloat
     private let showsIndicators: Bool
     private let isPullToRefreshEnabled: Bool
     private let isRefreshing: Binding<Bool>
+    private let listStyle: Style
+    private let listTopPadding: CGFloat
     private let onRefresh: () -> Void
     private let pullingViewBuilder: (_ progress: CGFloat) -> PullingViewType
     private let refreshingViewBuilder: (_ isTriggered: Bool) -> RefreshingViewType
@@ -31,6 +33,7 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
     @StateObject private var scrollViewState: ScrollViewState = ScrollViewState()
 
     @State private var safeAreaTopInset: CGFloat = 0
+    @State private var offsetValue: CGFloat = 0
 
     // MARK: - Initialization
 
@@ -39,6 +42,8 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
                 showsIndicators: Bool = true,
                 isPullToRefreshEnabled: Bool = true,
                 isRefreshing: Binding<Bool>,
+                listStyle: Style = .automatic,
+                listTopPadding: CGFloat = 0,
                 onRefresh: @escaping () -> Void,
                 @ViewBuilder pullingViewBuilder: @escaping (_ progress: CGFloat) -> PullingViewType,
                 @ViewBuilder refreshingViewBuilder: @escaping (_ isTriggered: Bool) -> RefreshingViewType,
@@ -48,6 +53,8 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
         self.showsIndicators = showsIndicators
         self.isPullToRefreshEnabled = isPullToRefreshEnabled
         self.isRefreshing = isRefreshing
+        self.listStyle = listStyle
+        self.listTopPadding = listTopPadding
         self.onRefresh = onRefresh
         self.pullingViewBuilder = pullingViewBuilder
         self.refreshingViewBuilder = refreshingViewBuilder
@@ -80,7 +87,7 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
                     // view to show pull to refresh animations
                     // List inset is calculated as safeAreaTopInset + this view height
                     Color.clear
-                        .frame(height: refreshViewHeight * scrollViewState.progress)
+                        .frame(height: offsetValue)
                     List(content: {
                         // view for offset calculation
                         Color.clear
@@ -88,9 +95,11 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
                             .frame(height: 0)
                             .listRowInsets(EdgeInsets())
                             .offset(coordinateSpace: PullToRefreshListViewConstant.coordinateSpace, offset: { (offset) in
-                                let offsetConclusive = offset - safeAreaTopInset
+                                let offsetConclusive = offset - safeAreaTopInset - listTopPadding
+                                let offsetOld = scrollViewState.contentOffset
                                 scrollViewState.contentOffset = offsetConclusive
                                 updateProgressIfNeeded()
+                                updateOffsetValueIfNeeded(oldContentOffset: offsetOld)
                                 stopIfNeeded()
                                 resetReadyToTriggerIfNeeded()
                                 startIfNeeded()
@@ -100,7 +109,9 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
                     })
                     .environment(\.defaultMinListRowHeight, 0)
                     .coordinateSpace(name: PullToRefreshListViewConstant.coordinateSpace)
-                    .listStyle(PlainListStyle())
+                    .listStyle(listStyle)
+                    .scrollContentBackground(.hidden)
+                    .contentMargins(.vertical, listTopPadding)
                 })
                 .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
             })
@@ -125,6 +136,9 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
                 scrollViewState.isRefreshing = false
                 stopIfNeeded()
                 resetReadyToTriggerIfNeeded()
+                withAnimation {
+                    offsetValue = 0
+                }
             }
         })
         .onChange(of: scrollViewState.isDragging, perform: { (_) in
@@ -159,6 +173,19 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
             if scrollViewState.isTriggered {
                 scrollViewState.isTriggered = false
             }
+        }
+    }
+
+    private func updateOffsetValueIfNeeded(oldContentOffset: CGFloat) {
+        // when user touched up in triggered state and List is moving up,
+        // we wait for the moment when top offset of List becomes equal to refreshViewHeight
+        // then set offsetValue to refreshViewHeight to make space above the List
+        if !scrollViewState.isDragging,
+           scrollViewState.isTriggered,
+           scrollViewState.contentOffset <= refreshViewHeight,
+           oldContentOffset > scrollViewState.contentOffset,
+           offsetValue == 0 {
+            offsetValue = refreshViewHeight
         }
     }
 
