@@ -10,6 +10,8 @@
 - [Usage](#usage)
 - [License](#license)
 
+`PullToRefreshSwiftUI` library contains `PullToRefreshScrollView` and `PullToRefreshListView` controls, that allows to add pull to refresh to SwiftUI ScrollView and ListsView.
+
 A `PullToRefreshScrollView` is a custom control that alows to put some content on scroll view with pull to refresh action.
 
 `PullToRefreshScrollView` example:
@@ -43,6 +45,40 @@ PullToRefreshScrollView(
 ```
 
 ![](Resources/pull_to_refresh_example_1.gif)
+
+A `PullToRefreshListView` is a custom control that alows to add some content to list view with pull to refresh action.
+
+`PullToRefreshListView` example:
+
+```swift
+PullToRefreshListView(
+    options: PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 100,
+                                          animationDuration: 0.3,
+                                          animatePullingViewPresentation: true,
+                                          animateRefreshingViewPresentation: true),
+    isRefreshing: $isRefreshing,
+    onRefresh: {
+        debugPrint("Refreshing")
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(5), execute: {
+            isRefreshing = false
+        })
+    },
+    pullingViewBuilder: { (progress) in
+        ProgressView(value: progress, total: 1)
+            .progressViewStyle(.linear)
+    },
+    refreshingViewBuilder: { (isTriggered) in
+        ProgressView()
+            .progressViewStyle(.circular)
+    },
+    contentViewBuilder: { _ in
+        ForEach(0..<5, content: { (item) in
+            Text("Item \(item)")
+        })
+    })
+```
+
+![](Resources/pull_to_refresh_example_1.gif) // TODO: implement
 
 ## Requirements
 
