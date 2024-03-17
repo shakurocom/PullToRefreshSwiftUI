@@ -4,10 +4,20 @@ import SwiftUI
 
 struct ScrollContentView: View {
 
+    private enum AnimationType {
+        case native
+        case progressView
+        case lottie
+    }
+
     @State private var isRefreshing: Bool = false
+    @State private var animationType: AnimationType = .native
 
     var body: some View {
-        let options = PullToRefreshScrollViewOptions()
+        let options = PullToRefreshScrollViewOptions(pullToRefreshAnimationHeight: 200,
+                                                     animationDuration: 0.3,
+                                                     animatePullingViewPresentation: true,
+                                                     animateRefreshingViewPresentation: true)
         PullToRefreshScrollView(
             options: options,
             isRefreshing: $isRefreshing,
@@ -18,41 +28,47 @@ struct ScrollContentView: View {
                 })
             },
             pullingViewBuilder: { (progress) in
-                Circle()
-                    .trim(from: 0, to: progress * 0.9)
-                    .stroke(Color.green, lineWidth: 5)
-                    .frame(width: 100, height: 100)
-                    .rotationEffect(Angle(degrees: 270))
-
-//                ProgressView(value: progress, total: 1)
-//                    .progressViewStyle(.linear)
-
-                // TODO: implement
-//                LottieView(animation: .named("animation-pulling-shakuro_logo"))
-//                    .playbackMode(.paused(at: .progress(progress)))
+                switch animationType {
+                case .native:
+                    CircleAnimationWithProgressView(progress: progress)
+                case .progressView:
+                    ProgressView(value: progress, total: 1)
+                        .progressViewStyle(.linear)
+                case .lottie:
+                    LottieView(animation: .named("animation-pulling-shakuro_logo"))
+                        .playbackMode(.paused(at: .progress(progress)))
+                }
             },
             refreshingViewBuilder: { (isTriggered) in
-                if isTriggered {
-                    CircleAnimationView()
-                } else {
-                    Color.clear
+                switch animationType {
+                case .native:
+                    if isTriggered {
+                        CircleAnimationWithRepeatView()
+                    } else {
+                        Color.clear
+                    }
+                case .progressView:
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                case .lottie:
+                    LottieView(animation: .named("animation-refreshing-shakuro_logo"))
+                        .playbackMode(isTriggered ? .playing(.fromProgress(0, toProgress: 1, loopMode: .loop)) : .paused)
                 }
-
-//                ProgressView()
-//                    .progressViewStyle(.circular)
-
-                // TODO: implement
-//                LottieView(animation: .named("animation-refreshing-shakuro_logo"))
-//                    .playbackMode(isTriggered ? .playing(.fromProgress(0, toProgress: 1, loopMode: .loop)) : .paused)
             },
             contentViewBuilder: { _ in
-                VStack(content: {
+                VStack(spacing: 16, content: {
                     Text(isRefreshing ? "Refreshing" : "Idle")
                         .font(.largeTitle)
                         .foregroundStyle(isRefreshing ? .white : .black)
-                        .padding(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+                    Picker("Current animation type", selection: $animationType) {
+                        Text("Native").tag(AnimationType.native)
+                        Text("ProgressView").tag(AnimationType.progressView)
+                        Text("Lottie").tag(AnimationType.lottie)
+                    }
+                    .pickerStyle(.segmented)
                     Color.clear
                 })
+                .padding(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                 .background(Color(isRefreshing ? .darkGray : .lightGray))
                 .frame(height: 1000)
             })
@@ -64,23 +80,4 @@ struct ScrollContentView: View {
 
 #Preview {
     ScrollContentView()
-}
-
-private struct CircleAnimationView: View {
-
-    @State private var rotationDegrees: CGFloat = 0.0
-
-    var body: some View {
-        Circle()
-            .trim(from: 0, to: 0.9)
-            .stroke(Color.green, lineWidth: 5)
-            .frame(width: 100, height: 100)
-            .rotationEffect(Angle(degrees: 270))
-            .rotationEffect(Angle(degrees: rotationDegrees))
-            .animation(.linear(duration: 1).repeatForever(autoreverses: false), value: rotationDegrees)
-            .onAppear(perform: {
-                rotationDegrees = 360
-            })
-    }
-
 }

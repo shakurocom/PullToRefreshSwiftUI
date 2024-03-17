@@ -2,24 +2,30 @@ import SwiftUI
 
 public struct PullToRefreshScrollViewOptions {
 
+    public let pullToRefreshAnimationHeight: CGFloat
     public let animationDuration: TimeInterval
+    public let animatePullingViewPresentation: Bool
+    public let animateRefreshingViewPresentation: Bool
 
-    public init(animationDuration: TimeInterval = 0.3) {
+    public init(pullToRefreshAnimationHeight: CGFloat = 100,
+                animationDuration: TimeInterval = 0.3,
+                animatePullingViewPresentation: Bool = true,
+                animateRefreshingViewPresentation: Bool = true) {
+        self.pullToRefreshAnimationHeight = pullToRefreshAnimationHeight
         self.animationDuration = animationDuration
+        self.animatePullingViewPresentation = animatePullingViewPresentation
+        self.animateRefreshingViewPresentation = animateRefreshingViewPresentation
     }
 
 }
 
-public enum PullToRefreshScrollViewConstant {
-    public static let coordinateSpace: String = "PullToRefreshScrollView.CoordinateSpace"
-    public static let height: CGFloat = 100
-    public static let offset: CGFloat = 0
+private enum PullToRefreshScrollViewConstant {
+    static let coordinateSpace: String = "PullToRefreshScrollView.CoordinateSpace"
 }
 
 public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType: View, ContentViewType: View>: View {
 
     private let options: PullToRefreshScrollViewOptions
-    private let refreshViewHeight: CGFloat
     private let showsIndicators: Bool
     private let isPullToRefreshEnabled: Bool
     private let isRefreshing: Binding<Bool>
@@ -33,7 +39,6 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
     // MARK: - Initialization
 
     public init(options: PullToRefreshScrollViewOptions,
-                refreshViewHeight: CGFloat = (PullToRefreshScrollViewConstant.offset * 2 + PullToRefreshScrollViewConstant.height),
                 showsIndicators: Bool = true,
                 isPullToRefreshEnabled: Bool = true,
                 isRefreshing: Binding<Bool>,
@@ -42,7 +47,6 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
                 @ViewBuilder refreshingViewBuilder: @escaping (_ isTriggered: Bool) -> RefreshingViewType,
                 @ViewBuilder contentViewBuilder: @escaping (_ scrollViewSize: CGSize) -> ContentViewType) {
         self.options = options
-        self.refreshViewHeight = refreshViewHeight
         self.showsIndicators = showsIndicators
         self.isPullToRefreshEnabled = isPullToRefreshEnabled
         self.isRefreshing = isRefreshing
@@ -63,12 +67,14 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
                     pullingViewBuilder(scrollViewState.progress)
                         .modifier(GeometryGroupModifier())
                         .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
+                        .animation(options.animatePullingViewPresentation ? defaultAnimation : nil, value: scrollViewState.progress)
+                        .animation(options.animatePullingViewPresentation ? defaultAnimation : nil, value: scrollViewState.isTriggered)
                     refreshingViewBuilder(scrollViewState.isTriggered)
                         .modifier(GeometryGroupModifier())
                         .opacity(scrollViewState.isTriggered ? 1 : 0)
+                        .animation(options.animateRefreshingViewPresentation ? defaultAnimation : nil, value: scrollViewState.isTriggered)
                 })
-                .frame(height: PullToRefreshScrollViewConstant.height) // TODO: implement
-                .offset(y: PullToRefreshScrollViewConstant.offset) // TODO: implement
+                .frame(height:  options.pullToRefreshAnimationHeight)
                 Color.clear
             })
             .opacity(isPullToRefreshEnabled ? 1 : 0)
@@ -77,7 +83,7 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
                 ScrollView(.vertical, showsIndicators: showsIndicators, content: {
                     VStack(spacing: 0, content: {
                         Color.clear
-                            .frame(height: refreshViewHeight * scrollViewState.progress)
+                            .frame(height: options.pullToRefreshAnimationHeight * scrollViewState.progress)
                         contentViewBuilder(geometryProxy.size)
                             .modifier(GeometryGroupModifier())
                     })
@@ -122,7 +128,7 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
 
     private func startIfNeeded() {
         if isPullToRefreshEnabled,
-           scrollViewState.contentOffset > refreshViewHeight,
+           scrollViewState.contentOffset >  options.pullToRefreshAnimationHeight,
            scrollViewState.isReadyToTrigger &&
             !scrollViewState.isRefreshing &&
             !scrollViewState.isTriggered {
@@ -159,7 +165,7 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
             // initial pulling will increase progress to 1; then when drag finished or
             // fetch finished stopIfNeeded() will be called where progress will be set to 0.
             // isRefreshing check is here because we need to remove conflict between setting progress.
-            scrollViewState.progress = min(max(scrollViewState.contentOffset / refreshViewHeight, 0), 1)
+            scrollViewState.progress = min(max(scrollViewState.contentOffset /  options.pullToRefreshAnimationHeight, 0), 1)
         }
     }
 

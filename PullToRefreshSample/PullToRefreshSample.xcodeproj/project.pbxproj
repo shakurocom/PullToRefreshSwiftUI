@@ -10,6 +10,8 @@
 		A51D6A4F2B83DE8000E44E19 /* PullToRefreshSampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A51D6A4E2B83DE8000E44E19 /* PullToRefreshSampleApp.swift */; };
 		A51D6A612B83E0E800E44E19 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A51D6A5E2B83E0E800E44E19 /* Assets.xcassets */; };
 		A51D6A622B83E0E800E44E19 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A51D6A602B83E0E800E44E19 /* Preview Assets.xcassets */; };
+		A5288C602BA6B45A0033D0AE /* CircleAnimationWithProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5288C5F2BA6B45A0033D0AE /* CircleAnimationWithProgressView.swift */; };
+		A5288C622BA6B4820033D0AE /* CircleAnimationWithRepeatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5288C612BA6B4820033D0AE /* CircleAnimationWithRepeatView.swift */; };
 		A54348322B84672600D1DDB0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54348312B84672600D1DDB0 /* ContentView.swift */; };
 		A56DF71D2B852C2C00477FBD /* PullToRefreshSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A56DF71C2B852C2C00477FBD /* PullToRefreshSwiftUI */; };
 		A5BA6BAD2B870CEE00DAE39C /* ScrollContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5BA6BAC2B870CEE00DAE39C /* ScrollContentView.swift */; };
@@ -25,6 +27,8 @@
 		A51D6A5C2B83DE9B00E44E19 /* PullToRefreshSwiftUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = PullToRefreshSwiftUI; path = ..; sourceTree = "<group>"; };
 		A51D6A5E2B83E0E800E44E19 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A51D6A602B83E0E800E44E19 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		A5288C5F2BA6B45A0033D0AE /* CircleAnimationWithProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleAnimationWithProgressView.swift; sourceTree = "<group>"; };
+		A5288C612BA6B4820033D0AE /* CircleAnimationWithRepeatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleAnimationWithRepeatView.swift; sourceTree = "<group>"; };
 		A54348312B84672600D1DDB0 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A5BA6BAC2B870CEE00DAE39C /* ScrollContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollContentView.swift; sourceTree = "<group>"; };
 		A5BA6BAE2B870D0100DAE39C /* ListContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListContentView.swift; sourceTree = "<group>"; };
@@ -106,6 +110,8 @@
 				A54348312B84672600D1DDB0 /* ContentView.swift */,
 				A5BA6BAC2B870CEE00DAE39C /* ScrollContentView.swift */,
 				A5BA6BAE2B870D0100DAE39C /* ListContentView.swift */,
+				A5288C5F2BA6B45A0033D0AE /* CircleAnimationWithProgressView.swift */,
+				A5288C612BA6B4820033D0AE /* CircleAnimationWithRepeatView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -198,8 +204,10 @@
 			files = (
 				A54348322B84672600D1DDB0 /* ContentView.swift in Sources */,
 				A5BA6BAD2B870CEE00DAE39C /* ScrollContentView.swift in Sources */,
+				A5288C622BA6B4820033D0AE /* CircleAnimationWithRepeatView.swift in Sources */,
 				A5BA6BAF2B870D0100DAE39C /* ListContentView.swift in Sources */,
 				A51D6A4F2B83DE8000E44E19 /* PullToRefreshSampleApp.swift in Sources */,
+				A5288C602BA6B45A0033D0AE /* CircleAnimationWithProgressView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

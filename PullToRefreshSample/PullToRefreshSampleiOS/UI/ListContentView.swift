@@ -20,7 +20,14 @@ enum ListContentViewConstant {
 
 struct ListContentView: View {
 
+    private enum AnimationType {
+        case native
+        case progressView
+        case lottie
+    }
+
     @State private var isRefreshing: Bool = false
+    @State private var animationType: AnimationType = .native
 
     @State private var items: [ListItem] = [
         ListItem(title: "Item 1"),
@@ -47,7 +54,10 @@ struct ListContentView: View {
     ]
 
     var body: some View {
-        let options = PullToRefreshListViewOptions()
+        let options = PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 200,
+                                                   animationDuration: 0.3,
+                                                   animatePullingViewPresentation: true,
+                                                   animateRefreshingViewPresentation: true)
         PullToRefreshListView(
             options: options,
             isRefreshing: $isRefreshing,
@@ -59,14 +69,40 @@ struct ListContentView: View {
                 })
             },
             pullingViewBuilder: { (progress) in
-                LottieView(animation: .named("animation-pulling-shakuro_logo"))
-                    .playbackMode(.paused(at: .progress(progress)))
+                switch animationType {
+                case .native:
+                    CircleAnimationWithProgressView(progress: progress)
+                case .progressView:
+                    ProgressView(value: progress, total: 1)
+                        .progressViewStyle(.linear)
+                case .lottie:
+                    LottieView(animation: .named("animation-pulling-shakuro_logo"))
+                        .playbackMode(.paused(at: .progress(progress)))
+                }
             },
             refreshingViewBuilder: { (isTriggered) in
-                LottieView(animation: .named("animation-refreshing-shakuro_logo"))
-                    .playbackMode(isTriggered ? .playing(.fromProgress(0, toProgress: 1, loopMode: .loop)) : .paused)
+                switch animationType {
+                case .native:
+                    if isTriggered {
+                        CircleAnimationWithRepeatView()
+                    } else {
+                        Color.clear
+                    }
+                case .progressView:
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                case .lottie:
+                    LottieView(animation: .named("animation-refreshing-shakuro_logo"))
+                        .playbackMode(isTriggered ? .playing(.fromProgress(0, toProgress: 1, loopMode: .loop)) : .paused)
+                }
             },
             contentViewBuilder: { _ in
+                Picker("Current animation type", selection: $animationType) {
+                    Text("Native").tag(AnimationType.native)
+                    Text("ProgressView").tag(AnimationType.progressView)
+                    Text("Lottie").tag(AnimationType.lottie)
+                }
+                .pickerStyle(.segmented)
                 ForEach(items, content: { (item) in
                     ListContentItemView(listItem: item)
                 })
