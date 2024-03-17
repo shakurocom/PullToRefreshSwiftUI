@@ -14,7 +14,7 @@ struct ScrollContentView: View {
     @State private var animationType: AnimationType = .native
 
     var body: some View {
-        let options = PullToRefreshScrollViewOptions(pullToRefreshAnimationHeight: 200,
+        let options = PullToRefreshScrollViewOptions(pullToRefreshAnimationHeight: 100,
                                                      animationDuration: 0.3,
                                                      animatePullingViewPresentation: true,
                                                      animateRefreshingViewPresentation: true)
@@ -70,6 +70,7 @@ struct ScrollContentView: View {
                 })
                 .padding(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
                 .background(Color(isRefreshing ? .darkGray : .lightGray))
+                .animation(.linear(duration: 0.3), value: isRefreshing)
                 .frame(height: 1000)
             })
         .navigationTitle("Scroll View Example")

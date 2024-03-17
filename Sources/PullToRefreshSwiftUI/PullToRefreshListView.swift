@@ -192,26 +192,30 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
 
 // MARK: - Preview
 
-// TODO: implement
-//struct PullToRefreshListView_Previews: PreviewProvider {
-//
-//    static var previews: some View {
-//        let options = PullToRefreshListViewOptions(lottieViewBackgroundColor: .green,
-//                                                   pullingLottieFileName: "animation-pulling-shakuro_logo",
-//                                                   refreshingLottieFileName: "animation-refreshing-shakuro_logo")
-//        PullToRefreshListView(
-//            options: options,
-//            isRefreshing: .constant(true),
-//            onRefresh: {
-//                debugPrint("Refreshing")
-//            },
-//            contentViewBuilder: { _ in
-//                Rectangle()
-//                    .fill(.red)
-//                    .frame(height: 1000)
-//            })
-//    }
-//}
+#Preview {
+    PullToRefreshListView(
+        options: PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 100,
+                                              animationDuration: 0.3,
+                                              animatePullingViewPresentation: true,
+                                              animateRefreshingViewPresentation: true),
+        isRefreshing: .constant(true),
+        onRefresh: {
+            debugPrint("Refreshing")
+        },
+        pullingViewBuilder: { (progress) in
+            ProgressView(value: progress, total: 1)
+                .progressViewStyle(.linear)
+        },
+        refreshingViewBuilder: { (isTriggered) in
+            ProgressView()
+                .progressViewStyle(.circular)
+        },
+        contentViewBuilder: { _ in
+            ForEach(0..<5, content: { (item) in
+                Text("Item \(item)")
+            })
+        })
+}
 
 // MARK: - ScrollViewState
 

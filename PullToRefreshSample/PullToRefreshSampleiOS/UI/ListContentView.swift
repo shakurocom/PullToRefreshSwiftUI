@@ -54,7 +54,7 @@ struct ListContentView: View {
     ]
 
     var body: some View {
-        let options = PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 200,
+        let options = PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 100,
                                                    animationDuration: 0.3,
                                                    animatePullingViewPresentation: true,
                                                    animateRefreshingViewPresentation: true)

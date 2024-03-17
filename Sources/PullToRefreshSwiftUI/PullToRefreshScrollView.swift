@@ -128,7 +128,7 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
 
     private func startIfNeeded() {
         if isPullToRefreshEnabled,
-           scrollViewState.contentOffset >  options.pullToRefreshAnimationHeight,
+           (scrollViewState.contentOffset * 2) >  options.pullToRefreshAnimationHeight,
            scrollViewState.isReadyToTrigger &&
             !scrollViewState.isRefreshing &&
             !scrollViewState.isTriggered {
@@ -165,7 +165,7 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
             // initial pulling will increase progress to 1; then when drag finished or
             // fetch finished stopIfNeeded() will be called where progress will be set to 0.
             // isRefreshing check is here because we need to remove conflict between setting progress.
-            scrollViewState.progress = min(max(scrollViewState.contentOffset /  options.pullToRefreshAnimationHeight, 0), 1)
+            scrollViewState.progress = min(max((scrollViewState.contentOffset * 2) /  options.pullToRefreshAnimationHeight, 0), 1)
         }
     }
 
@@ -173,26 +173,29 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
 
 // MARK: - Preview
 
-// TODO: implement
-//struct PullToRefreshScrollView_Previews: PreviewProvider {
-//
-//    static var previews: some View {
-//        let options = PullToRefreshScrollViewOptions(lottieViewBackgroundColor: .green,
-//                                                     pullingLottieFileName: "animation-pulling-shakuro_logo",
-//                                                     refreshingLottieFileName: "animation-refreshing-shakuro_logo")
-//        PullToRefreshScrollView(
-//            options: options,
-//            isRefreshing: .constant(true),
-//            onRefresh: {
-//                debugPrint("Refreshing")
-//            },
-//            contentViewBuilder: { _ in
-//                Rectangle()
-//                    .fill(.red)
-//                    .frame(height: 1000)
-//            })
-//    }
-//}
+#Preview {
+    PullToRefreshScrollView(
+        options: PullToRefreshScrollViewOptions(pullToRefreshAnimationHeight: 100,
+                                                animationDuration: 0.3,
+                                                animatePullingViewPresentation: true,
+                                                animateRefreshingViewPresentation: true),
+        isRefreshing: .constant(true),
+        onRefresh: {
+            debugPrint("Refreshing")
+        },
+        pullingViewBuilder: { (progress) in
+            ProgressView(value: progress, total: 1)
+                .progressViewStyle(.linear)
+        },
+        refreshingViewBuilder: { (isTriggered) in
+            ProgressView()
+                .progressViewStyle(.circular)
+        },
+        contentViewBuilder: { _ in
+            Color(.lightGray)
+                .frame(height: 1000)
+        })
+}
 
 // MARK: - ScrollViewState
 
