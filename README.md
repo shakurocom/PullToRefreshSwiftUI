@@ -78,7 +78,7 @@ PullToRefreshListView(
     })
 ```
 
-![](Resources/pull_to_refresh_example_1.gif) // TODO: implement
+![](Resources/pull_to_refresh_example_2.gif)
 
 ## Requirements
 
