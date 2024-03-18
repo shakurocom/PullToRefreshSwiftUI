@@ -1,6 +1,5 @@
 import SwiftUI
 
-@available(iOS 17.0, *)
 struct ContentView: View {
 
     private enum Option {
@@ -8,8 +7,45 @@ struct ContentView: View {
         case scroll
     }
 
-    @State private var preferredColumn = NavigationSplitViewColumn.sidebar
     @State private var options: [Option] = [.list, .scroll]
+
+    var body: some View {
+        NavigationView(content: {
+            List(content: {
+                ForEach(options, id: \.self, content: { (option) in
+                    NavigationLink(destination: {
+                        switch option {
+                        case .list:
+                            ListContentView()
+                        case .scroll:
+                            ScrollContentView()
+                        }
+                    }, label: {
+                        switch option {
+                        case .list:
+                            Text("List View")
+                        case .scroll:
+                            Text("Scroll View")
+                        }
+                    })
+                })
+            })
+            .navigationTitle("Options")
+        })
+    }
+
+}
+
+@available(iOS 17.0, *)
+struct ContentViewWithSplitView: View {
+
+    private enum Option {
+        case list
+        case scroll
+    }
+
+    @State private var options: [Option] = [.list, .scroll]
+    @State private var preferredColumn = NavigationSplitViewColumn.sidebar
     @State private var selectedOption: Option?
 
     var body: some View {
@@ -43,8 +79,8 @@ struct ContentView: View {
 
 #Preview {
     if #available(iOS 17.0, *) {
-        ContentView()
+        ContentViewWithSplitView()
     } else {
-        Color.red // TODO: implement
+        ContentView()
     }
 }
