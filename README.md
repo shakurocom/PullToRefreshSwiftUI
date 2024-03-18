@@ -1,7 +1,7 @@
 ![Shakuro PullToRefreshSwiftUI](Resources/title_image.png)
 <br><br>
 # PullToRefreshSwiftUI
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg)
 ![License MIT](https://img.shields.io/badge/license-MIT-green.svg)
 
@@ -100,7 +100,7 @@ Add `PullToRefreshSwiftUI` as a dependency in your `Package.swift` manifest:
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/shakurocom/PullToRefreshSwiftUI.git", from: "1.0.0")
+  .package(url: "https://github.com/shakurocom/PullToRefreshSwiftUI.git", from: "1.1.0")
 ]
 ```
 
