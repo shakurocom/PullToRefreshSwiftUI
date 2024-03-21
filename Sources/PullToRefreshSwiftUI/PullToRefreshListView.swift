@@ -24,15 +24,20 @@ private enum PullToRefreshListViewConstant {
     static let coordinateSpace: String = "PullToRefreshListView.CoordinateSpace"
 }
 
-public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: View, ContentViewType: View>: View {
+public enum PullToRefreshListViewState {
+    case idle
+    case pulling(progress: CGFloat)
+    case refreshing
+}
+
+public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: View>: View {
 
     private let options: PullToRefreshListViewOptions
     private let showsIndicators: Bool
     private let isPullToRefreshEnabled: Bool
     private let isRefreshing: Binding<Bool>
     private let onRefresh: () -> Void
-    private let pullingViewBuilder: (_ progress: CGFloat) -> PullingViewType
-    private let refreshingViewBuilder: (_ isTriggered: Bool) -> RefreshingViewType
+    private let animationViewBuilder: (_ state: PullToRefreshListViewState) -> AnimationViewType
     private let contentViewBuilder: (_ scrollViewSize: CGSize) -> ContentViewType
 
     @StateObject private var scrollViewState: ScrollViewState = ScrollViewState()
@@ -46,16 +51,14 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
                 isPullToRefreshEnabled: Bool = true,
                 isRefreshing: Binding<Bool>,
                 onRefresh: @escaping () -> Void,
-                @ViewBuilder pullingViewBuilder: @escaping (_ progress: CGFloat) -> PullingViewType,
-                @ViewBuilder refreshingViewBuilder: @escaping (_ isTriggered: Bool) -> RefreshingViewType,
+                @ViewBuilder animationViewBuilder: @escaping (_ state: PullToRefreshListViewState) -> AnimationViewType,
                 @ViewBuilder contentViewBuilder: @escaping (_ scrollViewSize: CGSize) -> ContentViewType) {
         self.options = options
         self.showsIndicators = showsIndicators
         self.isPullToRefreshEnabled = isPullToRefreshEnabled
         self.isRefreshing = isRefreshing
         self.onRefresh = onRefresh
-        self.pullingViewBuilder = pullingViewBuilder
-        self.refreshingViewBuilder = refreshingViewBuilder
+        self.animationViewBuilder = animationViewBuilder
         self.contentViewBuilder = contentViewBuilder
     }
 
@@ -67,15 +70,8 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
             // animations
             VStack(spacing: 0, content: {
                 ZStack(alignment: .center, content: {
-                    pullingViewBuilder(scrollViewState.progress)
+                    animationViewBuilder(scrollViewState.state)
                         .modifier(GeometryGroupModifier())
-                        .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
-                        .animation(options.animatePullingViewPresentation ? defaultAnimation : nil, value: scrollViewState.progress)
-                        .animation(options.animatePullingViewPresentation ? defaultAnimation : nil, value: scrollViewState.isTriggered)
-                    refreshingViewBuilder(scrollViewState.isTriggered)
-                        .modifier(GeometryGroupModifier())
-                        .opacity(scrollViewState.isTriggered ? 1 : 0)
-                        .animation(options.animateRefreshingViewPresentation ? defaultAnimation : nil, value: scrollViewState.isTriggered)
                 })
                 .frame(height: options.pullToRefreshAnimationHeight)
                 Color.clear
@@ -192,30 +188,30 @@ public struct PullToRefreshListView<PullingViewType: View, RefreshingViewType: V
 
 // MARK: - Preview
 
-#Preview {
-    PullToRefreshListView(
-        options: PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 100,
-                                              animationDuration: 0.3,
-                                              animatePullingViewPresentation: true,
-                                              animateRefreshingViewPresentation: true),
-        isRefreshing: .constant(true),
-        onRefresh: {
-            debugPrint("Refreshing")
-        },
-        pullingViewBuilder: { (progress) in
-            ProgressView(value: progress, total: 1)
-                .progressViewStyle(.linear)
-        },
-        refreshingViewBuilder: { (isTriggered) in
-            ProgressView()
-                .progressViewStyle(.circular)
-        },
-        contentViewBuilder: { _ in
-            ForEach(0..<5, content: { (item) in
-                Text("Item \(item)")
-            })
-        })
-}
+//#Preview {
+//    PullToRefreshListView(
+//        options: PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 100,
+//                                              animationDuration: 0.3,
+//                                              animatePullingViewPresentation: true,
+//                                              animateRefreshingViewPresentation: true),
+//        isRefreshing: .constant(true),
+//        onRefresh: {
+//            debugPrint("Refreshing")
+//        },
+//        pullingViewBuilder: { (progress) in
+//            ProgressView(value: progress, total: 1)
+//                .progressViewStyle(.linear)
+//        },
+//        refreshingViewBuilder: { (isTriggered) in
+//            ProgressView()
+//                .progressViewStyle(.circular)
+//        },
+//        contentViewBuilder: { _ in
+//            ForEach(0..<5, content: { (item) in
+//                Text("Item \(item)")
+//            })
+//        })
+//}
 
 // MARK: - ScrollViewState
 
@@ -227,6 +223,16 @@ private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDe
     @Published var isRefreshing: Bool = false
     @Published var contentOffset: CGFloat = 0
     @Published var progress: CGFloat = 0
+
+    var state: PullToRefreshListViewState {
+        if isTriggered {
+            return .refreshing
+        } else if progress > 0 {
+            return .pulling(progress: progress)
+        } else {
+            return .idle
+        }
+    }
 
     private var panGestureRecognizer: UIPanGestureRecognizer?
 
