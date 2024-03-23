@@ -23,15 +23,20 @@ private enum PullToRefreshScrollViewConstant {
     static let coordinateSpace: String = "PullToRefreshScrollView.CoordinateSpace"
 }
 
-public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType: View, ContentViewType: View>: View {
+public enum PullToRefreshScrollViewState {
+    case idle
+    case pulling(progress: CGFloat)
+    case refreshing
+}
+
+public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: View>: View {
 
     private let options: PullToRefreshScrollViewOptions
     private let showsIndicators: Bool
     private let isPullToRefreshEnabled: Bool
     private let isRefreshing: Binding<Bool>
     private let onRefresh: () -> Void
-    private let pullingViewBuilder: (_ progress: CGFloat) -> PullingViewType
-    private let refreshingViewBuilder: (_ isTriggered: Bool) -> RefreshingViewType
+    private let animationViewBuilder: (_ state: PullToRefreshScrollViewState) -> AnimationViewType
     private let contentViewBuilder: (_ scrollViewSize: CGSize) -> ContentViewType
 
     @StateObject private var scrollViewState: ScrollViewState = ScrollViewState()
@@ -43,16 +48,14 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
                 isPullToRefreshEnabled: Bool = true,
                 isRefreshing: Binding<Bool>,
                 onRefresh: @escaping () -> Void,
-                @ViewBuilder pullingViewBuilder: @escaping (_ progress: CGFloat) -> PullingViewType,
-                @ViewBuilder refreshingViewBuilder: @escaping (_ isTriggered: Bool) -> RefreshingViewType,
+                @ViewBuilder animationViewBuilder: @escaping (_ state: PullToRefreshScrollViewState) -> AnimationViewType,
                 @ViewBuilder contentViewBuilder: @escaping (_ scrollViewSize: CGSize) -> ContentViewType) {
         self.options = options
         self.showsIndicators = showsIndicators
         self.isPullToRefreshEnabled = isPullToRefreshEnabled
         self.isRefreshing = isRefreshing
         self.onRefresh = onRefresh
-        self.pullingViewBuilder = pullingViewBuilder
-        self.refreshingViewBuilder = refreshingViewBuilder
+        self.animationViewBuilder = animationViewBuilder
         self.contentViewBuilder = contentViewBuilder
     }
 
@@ -61,20 +64,13 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
     public var body: some View {
         let defaultAnimation: Animation = .easeInOut(duration: options.animationDuration)
         ZStack(alignment: .top, content: {
-            // animations
+            // Animations
             VStack(spacing: 0, content: {
                 ZStack(alignment: .center, content: {
-                    pullingViewBuilder(scrollViewState.progress)
+                    animationViewBuilder(scrollViewState.state)
                         .modifier(GeometryGroupModifier())
-                        .opacity(scrollViewState.progress == 0 || scrollViewState.isTriggered ? 0 : 1)
-                        .animation(options.animatePullingViewPresentation ? defaultAnimation : nil, value: scrollViewState.progress)
-                        .animation(options.animatePullingViewPresentation ? defaultAnimation : nil, value: scrollViewState.isTriggered)
-                    refreshingViewBuilder(scrollViewState.isTriggered)
-                        .modifier(GeometryGroupModifier())
-                        .opacity(scrollViewState.isTriggered ? 1 : 0)
-                        .animation(options.animateRefreshingViewPresentation ? defaultAnimation : nil, value: scrollViewState.isTriggered)
                 })
-                .frame(height:  options.pullToRefreshAnimationHeight)
+                .frame(height: options.pullToRefreshAnimationHeight)
                 Color.clear
             })
             .opacity(isPullToRefreshEnabled ? 1 : 0)
@@ -173,29 +169,29 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
 
 // MARK: - Preview
 
-#Preview {
-    PullToRefreshScrollView(
-        options: PullToRefreshScrollViewOptions(pullToRefreshAnimationHeight: 100,
-                                                animationDuration: 0.3,
-                                                animatePullingViewPresentation: true,
-                                                animateRefreshingViewPresentation: true),
-        isRefreshing: .constant(true),
-        onRefresh: {
-            debugPrint("Refreshing")
-        },
-        pullingViewBuilder: { (progress) in
-            ProgressView(value: progress, total: 1)
-                .progressViewStyle(.linear)
-        },
-        refreshingViewBuilder: { (isTriggered) in
-            ProgressView()
-                .progressViewStyle(.circular)
-        },
-        contentViewBuilder: { _ in
-            Color(.lightGray)
-                .frame(height: 1000)
-        })
-}
+//#Preview {
+//    PullToRefreshScrollView(
+//        options: PullToRefreshScrollViewOptions(pullToRefreshAnimationHeight: 100,
+//                                                animationDuration: 0.3,
+//                                                animatePullingViewPresentation: true,
+//                                                animateRefreshingViewPresentation: true),
+//        isRefreshing: .constant(true),
+//        onRefresh: {
+//            debugPrint("Refreshing")
+//        },
+//        pullingViewBuilder: { (progress) in
+//            ProgressView(value: progress, total: 1)
+//                .progressViewStyle(.linear)
+//        },
+//        refreshingViewBuilder: { (isTriggered) in
+//            ProgressView()
+//                .progressViewStyle(.circular)
+//        },
+//        contentViewBuilder: { _ in
+//            Color(.lightGray)
+//                .frame(height: 1000)
+//        })
+//}
 
 // MARK: - ScrollViewState
 
@@ -209,6 +205,16 @@ private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDe
     @Published var progress: CGFloat = 0
 
     private var panGestureRecognizer: UIPanGestureRecognizer?
+
+    var state: PullToRefreshScrollViewState {
+        if isTriggered {
+            return .refreshing
+        } else if progress > 0 {
+            return .pulling(progress: progress)
+        } else {
+            return .idle
+        }
+    }
 
     // MARK: - Public
 

@@ -67,7 +67,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
     public var body: some View {
         let defaultAnimation: Animation = .easeInOut(duration: options.animationDuration)
         ZStack(alignment: .top, content: {
-            // animations
+            // Animations
             VStack(spacing: 0, content: {
                 ZStack(alignment: .center, content: {
                     animationViewBuilder(scrollViewState.state)
