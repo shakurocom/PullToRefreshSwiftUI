@@ -20,10 +20,6 @@ public struct PullToRefreshListViewOptions {
 
 }
 
-private enum PullToRefreshListViewConstant {
-    static let coordinateSpace: String = "PullToRefreshListView.CoordinateSpace"
-}
-
 public enum PullToRefreshListViewState {
     case idle
     case pulling(progress: CGFloat)
@@ -42,7 +38,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
 
     @StateObject private var scrollViewState: ScrollViewState = ScrollViewState()
 
-    @State private var safeAreaTopInset: CGFloat = 0
+    @State private var topOffset: CGFloat = 0
 
     // MARK: - Initialization
 
@@ -90,8 +86,8 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                             .listRowSeparator(.hidden, edges: .top)
                             .frame(height: 0)
                             .listRowInsets(EdgeInsets())
-                            .readLayoutData(coordinateSpace: .named(PullToRefreshListViewConstant.coordinateSpace), onChange: { (data) in
-                                let offsetConclusive = data.frameInCoordinateSpace.minY - safeAreaTopInset
+                            .readLayoutData(coordinateSpace: .global, onChange: { (data) in
+                                let offsetConclusive = data.frameInCoordinateSpace.minY - topOffset
                                 scrollViewState.contentOffset = offsetConclusive
                                 updateProgressIfNeeded()
                                 stopIfNeeded()
@@ -102,14 +98,13 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                             .modifier(GeometryGroupModifier())
                     })
                     .environment(\.defaultMinListRowHeight, 0)
-                    .coordinateSpace(name: PullToRefreshListViewConstant.coordinateSpace)
                     .listStyle(PlainListStyle())
                 })
                 .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
             })
         })
         .readLayoutData(coordinateSpace: .global, onChange: { (data) in
-            safeAreaTopInset = data.safeAreaInsets.top
+            topOffset = data.frameInCoordinateSpace.minY
         })
         .onAppear(perform: {
             scrollViewState.addGestureRecognizer()
