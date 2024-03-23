@@ -90,8 +90,8 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                             .listRowSeparator(.hidden, edges: .top)
                             .frame(height: 0)
                             .listRowInsets(EdgeInsets())
-                            .offset(coordinateSpace: PullToRefreshListViewConstant.coordinateSpace, offset: { (offset) in
-                                let offsetConclusive = offset - safeAreaTopInset
+                            .readLayoutData(coordinateSpace: .named(PullToRefreshListViewConstant.coordinateSpace), onChange: { (data) in
+                                let offsetConclusive = data.frameInCoordinateSpace.minY - safeAreaTopInset
                                 scrollViewState.contentOffset = offsetConclusive
                                 updateProgressIfNeeded()
                                 stopIfNeeded()
@@ -108,7 +108,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                 .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
             })
         })
-        .readSize(onChange: { (data) in
+        .readLayoutData(coordinateSpace: .global, onChange: { (data) in
             safeAreaTopInset = data.safeAreaInsets.top
         })
         .onAppear(perform: {

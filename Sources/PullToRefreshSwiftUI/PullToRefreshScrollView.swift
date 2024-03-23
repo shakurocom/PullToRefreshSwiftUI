@@ -88,8 +88,8 @@ public struct PullToRefreshScrollView<PullingViewType: View, RefreshingViewType:
                             .modifier(GeometryGroupModifier())
                     })
                     .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
-                    .offset(coordinateSpace: PullToRefreshScrollViewConstant.coordinateSpace, offset: { offset in
-                        scrollViewState.contentOffset = offset
+                    .readLayoutData(coordinateSpace: .named(PullToRefreshScrollViewConstant.coordinateSpace), onChange: { (data) in
+                        scrollViewState.contentOffset = data.frameInCoordinateSpace.minY
                         updateProgressIfNeeded()
                         stopIfNeeded()
                         resetReadyToTriggerIfNeeded()
