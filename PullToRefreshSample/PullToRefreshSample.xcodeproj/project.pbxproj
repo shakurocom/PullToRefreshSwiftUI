@@ -19,6 +19,7 @@
 		A5D2E8062B9E31920079FD9B /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = A5D2E8052B9E31920079FD9B /* Lottie */; };
 		A5DD89652B8867C600EF70A5 /* animation-refreshing-shakuro_logo.json in Resources */ = {isa = PBXBuildFile; fileRef = A5DD89632B8867C600EF70A5 /* animation-refreshing-shakuro_logo.json */; };
 		A5DD89662B8867C600EF70A5 /* animation-pulling-shakuro_logo.json in Resources */ = {isa = PBXBuildFile; fileRef = A5DD89642B8867C600EF70A5 /* animation-pulling-shakuro_logo.json */; };
+		A5EEB88C2BB0AEB00048B46B /* ContentViewWithSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5EEB88B2BB0AEB00048B46B /* ContentViewWithSplitView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		A5BA6BAE2B870D0100DAE39C /* ListContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListContentView.swift; sourceTree = "<group>"; };
 		A5DD89632B8867C600EF70A5 /* animation-refreshing-shakuro_logo.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "animation-refreshing-shakuro_logo.json"; sourceTree = "<group>"; };
 		A5DD89642B8867C600EF70A5 /* animation-pulling-shakuro_logo.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "animation-pulling-shakuro_logo.json"; sourceTree = "<group>"; };
+		A5EEB88B2BB0AEB00048B46B /* ContentViewWithSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewWithSplitView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				A54348312B84672600D1DDB0 /* ContentView.swift */,
+				A5EEB88B2BB0AEB00048B46B /* ContentViewWithSplitView.swift */,
 				A5BA6BAC2B870CEE00DAE39C /* ScrollContentView.swift */,
 				A5BA6BAE2B870D0100DAE39C /* ListContentView.swift */,
 				A5288C5F2BA6B45A0033D0AE /* CircleAnimationWithProgressView.swift */,
@@ -205,6 +208,7 @@
 				A54348322B84672600D1DDB0 /* ContentView.swift in Sources */,
 				A5BA6BAD2B870CEE00DAE39C /* ScrollContentView.swift in Sources */,
 				A5288C622BA6B4820033D0AE /* CircleAnimationWithRepeatView.swift in Sources */,
+				A5EEB88C2BB0AEB00048B46B /* ContentViewWithSplitView.swift in Sources */,
 				A5BA6BAF2B870D0100DAE39C /* ListContentView.swift in Sources */,
 				A51D6A4F2B83DE8000E44E19 /* PullToRefreshSampleApp.swift in Sources */,
 				A5288C602BA6B45A0033D0AE /* CircleAnimationWithProgressView.swift in Sources */,

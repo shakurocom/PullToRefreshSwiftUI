@@ -4,30 +4,34 @@
 
 import SwiftUI
 
+struct LayoutData: Equatable {
+    let size: CGSize
+    let frameInCoordinateSpace: CGRect
+    let safeAreaInsets: EdgeInsets
+}
+
 extension View {
 
-    internal func readSize(onChange: @escaping (ViewSizeData) -> Void) -> some View {
-        background(
-            GeometryReader(content: { (geometryProxy) in
-                Color.clear
-                    .preference(key: SizePreferenceKey.self, 
-                                value: ViewSizeData(size: geometryProxy.size, safeAreaInsets: geometryProxy.safeAreaInsets))
-            })
-        )
-        .onPreferenceChange(SizePreferenceKey.self, perform: onChange)
+    func readLayoutData(coordinateSpace: CoordinateSpace, onChange: @escaping (LayoutData) -> Void) -> some View {
+        self
+            .background(
+                GeometryReader(content: { (geometryProxy) in
+                    Color.clear
+                        .preference(key: SizePreferenceKey.self,
+                                    value: LayoutData(size: geometryProxy.size,
+                                                      frameInCoordinateSpace: geometryProxy.frame(in: coordinateSpace),
+                                                      safeAreaInsets: geometryProxy.safeAreaInsets))
+                })
+            )
+            .onPreferenceChange(SizePreferenceKey.self, perform: onChange)
     }
 
 }
 
-struct ViewSizeData: Equatable {
-    let size: CGSize
-    let safeAreaInsets: EdgeInsets
-}
-
 private struct SizePreferenceKey: PreferenceKey {
 
-    static var defaultValue: ViewSizeData = ViewSizeData(size: .zero, safeAreaInsets: EdgeInsets())
+    static var defaultValue: LayoutData = LayoutData(size: .zero, frameInCoordinateSpace: CGRect.zero, safeAreaInsets: EdgeInsets())
 
-    static func reduce(value: inout ViewSizeData, nextValue: () -> ViewSizeData) { }
+    static func reduce(value: inout LayoutData, nextValue: () -> LayoutData) { }
 
 }
