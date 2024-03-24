@@ -183,30 +183,34 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
 
 // MARK: - Preview
 
-//#Preview {
-//    PullToRefreshListView(
-//        options: PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 100,
-//                                              animationDuration: 0.3,
-//                                              animatePullingViewPresentation: true,
-//                                              animateRefreshingViewPresentation: true),
-//        isRefreshing: .constant(true),
-//        onRefresh: {
-//            debugPrint("Refreshing")
-//        },
-//        pullingViewBuilder: { (progress) in
-//            ProgressView(value: progress, total: 1)
-//                .progressViewStyle(.linear)
-//        },
-//        refreshingViewBuilder: { (isTriggered) in
-//            ProgressView()
-//                .progressViewStyle(.circular)
-//        },
-//        contentViewBuilder: { _ in
-//            ForEach(0..<5, content: { (item) in
-//                Text("Item \(item)")
-//            })
-//        })
-//}
+#Preview(body: {
+    PullToRefreshListView(
+        options: PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 100,
+                                              animationDuration: 0.3,
+                                              animatePullingViewPresentation: true,
+                                              animateRefreshingViewPresentation: true),
+        isRefreshing: .constant(true),
+        onRefresh: {
+            debugPrint("Refreshing")
+        },
+        animationViewBuilder: { (state) in
+            switch state {
+            case .idle:
+                Color.clear
+            case .pulling(let progress):
+                ProgressView(value: progress, total: 1)
+                    .progressViewStyle(.linear)
+            case .refreshing:
+                ProgressView()
+                    .progressViewStyle(.circular)
+            }
+        },
+        contentViewBuilder: { _ in
+            ForEach(0..<5, content: { (item) in
+                Text("Item \(item)")
+            })
+        })
+})
 
 // MARK: - ScrollViewState
 

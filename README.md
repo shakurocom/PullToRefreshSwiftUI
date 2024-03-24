@@ -29,17 +29,20 @@ PullToRefreshScrollView(
             isRefreshing = false
         })
     },
-    pullingViewBuilder: { (progress) in
-        ProgressView(value: progress, total: 1)
-            .progressViewStyle(.linear)
-    },
-    refreshingViewBuilder: { (isTriggered) in
-        ProgressView()
-            .progressViewStyle(.circular)
+    animationViewBuilder: { (state) in
+        switch state {
+        case .idle:
+            Color.clear
+        case .pulling(let progress):
+            ProgressView(value: progress, total: 1)
+                .progressViewStyle(.linear)
+        case .refreshing:
+            ProgressView()
+                .progressViewStyle(.circular)
+        }
     },
     contentViewBuilder: { _ in
-        Rectangle()
-            .fill(.gray)
+        Color(.lightGray)
             .frame(height: 1000)
     })
 ```
@@ -63,13 +66,17 @@ PullToRefreshListView(
             isRefreshing = false
         })
     },
-    pullingViewBuilder: { (progress) in
-        ProgressView(value: progress, total: 1)
-            .progressViewStyle(.linear)
-    },
-    refreshingViewBuilder: { (isTriggered) in
-        ProgressView()
-            .progressViewStyle(.circular)
+    animationViewBuilder: { (state) in
+        switch state {
+        case .idle:
+            Color.clear
+        case .pulling(let progress):
+            ProgressView(value: progress, total: 1)
+                .progressViewStyle(.linear)
+        case .refreshing:
+            ProgressView()
+                .progressViewStyle(.circular)
+        }
     },
     contentViewBuilder: { _ in
         ForEach(0..<5, content: { (item) in

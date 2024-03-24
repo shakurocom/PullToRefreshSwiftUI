@@ -14,12 +14,11 @@ struct ScrollContentView: View {
     @State private var animationType: AnimationType = .native
 
     var body: some View {
-        let options = PullToRefreshScrollViewOptions(pullToRefreshAnimationHeight: 100,
-                                                     animationDuration: 0.3,
-                                                     animatePullingViewPresentation: true,
-                                                     animateRefreshingViewPresentation: true)
         PullToRefreshScrollView(
-            options: options,
+            options: PullToRefreshScrollViewOptions(pullToRefreshAnimationHeight: 100,
+                                                    animationDuration: 0.3,
+                                                    animatePullingViewPresentation: true,
+                                                    animateRefreshingViewPresentation: true),
             isRefreshing: $isRefreshing,
             onRefresh: {
                 debugPrint("Refreshing")
