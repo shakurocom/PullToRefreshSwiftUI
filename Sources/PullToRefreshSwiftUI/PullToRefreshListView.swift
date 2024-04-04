@@ -84,7 +84,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                         // view for offset calculation
                         Color.clear
                             .listRowSeparator(.hidden, edges: .top)
-                            .frame(height: 0)
+                            .frame(height: 1)
                             .listRowInsets(EdgeInsets())
                             .readLayoutData(coordinateSpace: .global, onChange: { (data) in
                                 let offsetConclusive = data.frameInCoordinateSpace.minY - topOffset
