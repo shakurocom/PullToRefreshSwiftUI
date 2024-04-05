@@ -84,6 +84,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                         // view for offset calculation
                         Color.clear
                             .listRowSeparator(.hidden, edges: .top)
+                            .listRowBackground(Color.clear)
                             .frame(height: 1)
                             .listRowInsets(EdgeInsets())
                             .readLayoutData(coordinateSpace: .global, onChange: { (data) in
