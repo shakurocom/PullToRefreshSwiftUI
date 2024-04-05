@@ -34,7 +34,9 @@ struct ContentViewWithSplitView: View {
         } detail: {
             switch selectedOption {
             case .list:
-                ListContentView()
+                NavigationStack {
+                    ListContentView()
+                }
             case .scroll:
                 ScrollContentView()
             case .none:
