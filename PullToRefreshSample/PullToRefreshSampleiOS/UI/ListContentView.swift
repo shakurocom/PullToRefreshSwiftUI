@@ -76,8 +76,7 @@ struct ListContentView: View {
                     case .native:
                         CircleAnimationWithProgressView(progress: progress)
                     case .progressView:
-                        ProgressView(value: progress, total: 1)
-                            .progressViewStyle(.linear)
+                        CircularProgressView(progress: progress)
                     case .lottie:
                         LottieView(animation: .named("animation-pulling-shakuro_logo"))
                             .playbackMode(.paused(at: .progress(progress)))
