@@ -83,7 +83,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                     List(content: {
                         // view for offset calculation
                         Color.clear
-                            .listRowSeparator(.hidden, edges: .top)
+                            .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
                             .frame(height: 1)
                             .listRowInsets(EdgeInsets())
