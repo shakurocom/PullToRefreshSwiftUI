@@ -32,16 +32,3 @@ struct CircularProgressView: View {
 #Preview {
     CircularProgressView(progress: 0.8)
 }
-
-private struct StoppedActivityIndicator: UIViewRepresentable {
-
-    func updateUIView(_ uiView: UIActivityIndicatorView, context: Context) { }
-
-    func makeUIView(context: UIViewRepresentableContext<StoppedActivityIndicator>) -> UIActivityIndicatorView {
-        let spinner = UIActivityIndicatorView(style: .medium)
-        spinner.hidesWhenStopped = false
-        spinner.stopAnimating()
-        return spinner
-    }
-
-}
