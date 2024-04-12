@@ -73,14 +73,21 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                 Color.clear
             })
             .opacity(isPullToRefreshEnabled ? 1 : 0)
-            // List content
+
             GeometryReader(content: { (geometryProxy) in
-                VStack(spacing: 0, content: {
+                VStack(spacing: -options.pullToRefreshAnimationHeight, content: {
                     // view to show pull to refresh animations
                     // List inset is calculated as safeAreaTopInset + this view height
                     Color.clear
                         .frame(height: options.pullToRefreshAnimationHeight * scrollViewState.progress)
+                    // List content
                     List(content: {
+                        // view to save top List inset when scrolled down, equals -spacing of Vstack
+                        Color.clear
+                            .frame(height: options.pullToRefreshAnimationHeight)
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets())
                         // view for offset calculation
                         Color.clear
                             .listRowSeparator(.hidden)
@@ -101,12 +108,13 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                     .environment(\.defaultMinListRowHeight, 0)
                     .listStyle(PlainListStyle())
                 })
+                .readLayoutData(coordinateSpace: .global, onChange: { (data) in
+                    topOffset = data.frameInCoordinateSpace.minY
+                })
                 .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
             })
         })
-        .readLayoutData(coordinateSpace: .global, onChange: { (data) in
-            topOffset = data.frameInCoordinateSpace.minY
-        })
+
         .onAppear(perform: {
             scrollViewState.addGestureRecognizer()
         })
