@@ -28,6 +28,7 @@ struct ListContentView: View {
 
     @State private var isRefreshing: Bool = false
     @State private var animationType: AnimationType = .native
+    @State private var showRect: Bool = false
 
     @State private var items: [ListItem] = [
         ListItem(title: "Item 1"),
@@ -54,67 +55,82 @@ struct ListContentView: View {
     ]
 
     var body: some View {
-        PullToRefreshListView(
-            options: PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 100,
-                                                  animationDuration: 0.3,
-                                                  animatePullingViewPresentation: true,
-                                                  animateRefreshingViewPresentation: true),
-            isRefreshing: $isRefreshing,
-            onRefresh: {
-                debugPrint("Refreshing")
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(5), execute: {
-                    isRefreshing = false
-                    items.shuffle()
-                })
-            },
-            animationViewBuilder: { (state) in
-                switch state {
-                case .idle:
-                    Color.clear
-                case .pulling(let progress):
-                    switch animationType {
-                    case .native:
-                        CircleAnimationWithProgressView(progress: progress)
-                    case .progressView:
-                        CircularProgressView(progress: progress)
-                    case .lottie:
-                        LottieView(animation: .named("animation-pulling-shakuro_logo"))
-                            .playbackMode(.paused(at: .progress(progress)))
+        VStack(spacing: 0, content: {
+            Rectangle()
+                .fill(Color.black.opacity(0.4))
+                .frame(height: showRect ? 200 : 0)
+            PullToRefreshListView(
+                options: PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 100,
+                                                      animationDuration: 0.3,
+                                                      animatePullingViewPresentation: true,
+                                                      animateRefreshingViewPresentation: true),
+                isRefreshing: $isRefreshing,
+                onRefresh: {
+                    debugPrint("Refreshing")
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(5), execute: {
+                        isRefreshing = false
+                        items.shuffle()
+                    })
+                },
+                animationViewBuilder: { (state) in
+                    switch state {
+                    case .idle:
+                        Color.clear
+                    case .pulling(let progress):
+                        switch animationType {
+                        case .native:
+                            CircleAnimationWithProgressView(progress: progress)
+                        case .progressView:
+                            CircularProgressView(progress: progress)
+                        case .lottie:
+                            LottieView(animation: .named("animation-pulling-shakuro_logo"))
+                                .playbackMode(.paused(at: .progress(progress)))
+                        }
+                    case .refreshing:
+                        switch animationType {
+                        case .native:
+                            CircleAnimationWithRepeatView()
+                        case .progressView:
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                        case .lottie:
+                            LottieView(animation: .named("animation-refreshing-shakuro_logo"))
+                                .playbackMode(.playing(.fromProgress(0, toProgress: 1, loopMode: .loop)))
+                        }
                     }
-                case .refreshing:
-                    switch animationType {
-                    case .native:
-                        CircleAnimationWithRepeatView()
-                    case .progressView:
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                    case .lottie:
-                        LottieView(animation: .named("animation-refreshing-shakuro_logo"))
-                            .playbackMode(.playing(.fromProgress(0, toProgress: 1, loopMode: .loop)))
+                },
+                contentViewBuilder: { _ in
+
+                    Button(action: {
+                        showRect.toggle()
+                    }, label: {
+                        Label(showRect ? "Hide top rect" : "Show top rect", systemImage: "eye")
+                    })
+                    .padding(.all, 10)
+                    .border(Color.blue, width: 2)
+                    .frame(maxWidth: .infinity)
+                    Picker("Current animation type", selection: $animationType) {
+                        Text("Native").tag(AnimationType.native)
+                        Text("ProgressView").tag(AnimationType.progressView)
+                        Text("Lottie").tag(AnimationType.lottie)
                     }
-                }
-            },
-            contentViewBuilder: { _ in
-                Picker("Current animation type", selection: $animationType) {
-                    Text("Native").tag(AnimationType.native)
-                    Text("ProgressView").tag(AnimationType.progressView)
-                    Text("Lottie").tag(AnimationType.lottie)
-                }
-                .pickerStyle(.segmented)
-                .listRowSeparator(.hidden, edges: .top)
-                ForEach(items, content: { (item) in
-                    ListContentItemView(listItem: item)
+                    .pickerStyle(.segmented)
+                    .listRowSeparator(.hidden, edges: .top)
+                    ForEach(items, content: { (item) in
+                        ListContentItemView(listItem: item)
+                    })
+                    .onDelete(perform: { (indexSet) in
+                        items.remove(atOffsets: indexSet)
+                    })
+                    .onMove(perform: { (indices, newOffset) in
+                        items.move(fromOffsets: indices, toOffset: newOffset)
+                    })
                 })
-                .onDelete(perform: { (indexSet) in
-                    items.remove(atOffsets: indexSet)
-                })
-                .onMove(perform: { (indices, newOffset) in
-                    items.move(fromOffsets: indices, toOffset: newOffset)
-                })
-            })
+        })
         .navigationTitle("Items")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarItems(trailing: EditButton())
+
     }
 
 }

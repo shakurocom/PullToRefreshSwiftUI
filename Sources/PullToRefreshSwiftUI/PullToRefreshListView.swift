@@ -84,9 +84,9 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                     List(content: {
                         // view to save top List inset when scrolled down, equals -spacing of Vstack
                         Color.clear
-                            .frame(height: options.pullToRefreshAnimationHeight)
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
+                            .frame(height: options.pullToRefreshAnimationHeight)
                             .listRowInsets(EdgeInsets())
                         // view for offset calculation
                         Color.clear
@@ -96,6 +96,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                             .listRowInsets(EdgeInsets())
                             .readLayoutData(coordinateSpace: .global, onChange: { (data) in
                                 let offsetConclusive = data.frameInCoordinateSpace.minY - topOffset
+                                debugPrint("fake cell layout", Date(), offsetConclusive)
                                 scrollViewState.contentOffset = offsetConclusive
                                 updateProgressIfNeeded()
                                 stopIfNeeded()
@@ -108,8 +109,10 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                     .environment(\.defaultMinListRowHeight, 0)
                     .listStyle(PlainListStyle())
                 })
+                .clipped()
                 .readLayoutData(coordinateSpace: .global, onChange: { (data) in
                     topOffset = data.frameInCoordinateSpace.minY
+                    debugPrint("VStack layout", Date(), topOffset)
                 })
                 .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
             })
