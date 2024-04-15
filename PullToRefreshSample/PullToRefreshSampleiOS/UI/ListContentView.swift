@@ -14,10 +14,6 @@ struct ListItem: Identifiable {
 
 }
 
-enum ListContentViewConstant {
-    public static let coordinateSpace: String = "ListContentView.CoordinateSpace"
-}
-
 struct ListContentView: View {
 
     private enum AnimationType {
@@ -92,6 +88,30 @@ struct ListContentView: View {
                     case .lottie:
                         LottieView(animation: .named("animation-refreshing-shakuro_logo"))
                             .playbackMode(.playing(.fromProgress(0, toProgress: 1, loopMode: .loop)))
+                    }
+                case .finishing(let progress, let isTriggered):
+                    if isTriggered {
+                        switch animationType {
+                        case .native:
+                            CircleAnimationWithRepeatView()
+                        case .progressView:
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                        case .lottie:
+                            LottieView(animation: .named("animation-refreshing-shakuro_logo"))
+                                .playbackMode(.playing(.fromProgress(0, toProgress: 1, loopMode: .loop)))
+                        }
+                    } else {
+                        switch animationType {
+                        case .native:
+                            CircleAnimationWithProgressView(progress: progress)
+                        case .progressView:
+                            ProgressView(value: progress, total: 1)
+                                .progressViewStyle(.linear)
+                        case .lottie:
+                            LottieView(animation: .named("animation-pulling-shakuro_logo"))
+                                .playbackMode(.paused(at: .progress(progress)))
+                        }
                     }
                 }
             },

@@ -27,6 +27,7 @@ public enum PullToRefreshScrollViewState {
     case idle
     case pulling(progress: CGFloat)
     case refreshing
+    case finishing(progress: CGFloat, isTriggered: Bool)
 }
 
 public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: View>: View {
@@ -39,7 +40,7 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
     private let animationViewBuilder: (_ state: PullToRefreshScrollViewState) -> AnimationViewType
     private let contentViewBuilder: (_ scrollViewSize: CGSize) -> ContentViewType
 
-    @StateObject private var scrollViewState: ScrollViewState = ScrollViewState()
+    @StateObject private var scrollViewState: ScrollViewState
 
     // MARK: - Initialization
 
@@ -57,6 +58,7 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
         self.onRefresh = onRefresh
         self.animationViewBuilder = animationViewBuilder
         self.contentViewBuilder = contentViewBuilder
+        _scrollViewState = StateObject(wrappedValue: ScrollViewState(pullToRefreshAnimationHeight: options.pullToRefreshAnimationHeight))
     }
 
     // MARK: - UI
@@ -88,7 +90,7 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
                         scrollViewState.contentOffset = data.frameInCoordinateSpace.minY
                         updateProgressIfNeeded()
                         stopIfNeeded()
-                        resetReadyToTriggerIfNeeded()
+                        resetReadyTriggeredStateIfNeeded()
                         startIfNeeded()
                     })
                 })
@@ -101,22 +103,16 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
         .onDisappear(perform: {
             scrollViewState.removeGestureRecognizer()
         })
-        .onChange(of: scrollViewState.isTriggered, perform: { (isTriggered) in
-            guard isTriggered else {
-                return
-            }
-            isRefreshing.wrappedValue = true
-        })
         .onChange(of: isRefreshing.wrappedValue, perform: { (isRefreshing) in
             if !isRefreshing {
                 scrollViewState.isRefreshing = false
                 stopIfNeeded()
-                resetReadyToTriggerIfNeeded()
+                resetReadyTriggeredStateIfNeeded()
             }
         })
         .onChange(of: scrollViewState.isDragging, perform: { (_) in
             stopIfNeeded()
-            resetReadyToTriggerIfNeeded()
+            resetReadyTriggeredStateIfNeeded()
         })
     }
 
@@ -125,11 +121,9 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
     private func startIfNeeded() {
         if isPullToRefreshEnabled,
            (scrollViewState.contentOffset * 2) >  options.pullToRefreshAnimationHeight,
-           scrollViewState.isReadyToTrigger &&
-            !scrollViewState.isRefreshing &&
-            !scrollViewState.isTriggered {
+           !scrollViewState.isTriggered &&
+            !scrollViewState.isRefreshing {
 
-            scrollViewState.isReadyToTrigger = false
             scrollViewState.isTriggered = true
             scrollViewState.isRefreshing = true
             isRefreshing.wrappedValue = true
@@ -139,25 +133,25 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
     }
 
     private func stopIfNeeded() {
-        if !scrollViewState.isRefreshing && !scrollViewState.isDragging && scrollViewState.isTriggered {
-            scrollViewState.progress = 0
+        if !scrollViewState.isRefreshing && !scrollViewState.isDragging {
+            if scrollViewState.progress > 0 {
+                scrollViewState.progress = 0
+            }
+        }
+    }
+
+    private func resetReadyTriggeredStateIfNeeded() {
+        if scrollViewState.contentOffset <= 1 &&
+            scrollViewState.isTriggered &&
+            !scrollViewState.isRefreshing &&
+            !scrollViewState.isDragging {
+
             scrollViewState.isTriggered = false
         }
     }
 
-    private func resetReadyToTriggerIfNeeded() {
-        if scrollViewState.contentOffset <= 1 &&
-            !scrollViewState.isReadyToTrigger &&
-            !scrollViewState.isRefreshing &&
-            !scrollViewState.isDragging &&
-            !scrollViewState.isTriggered {
-
-            scrollViewState.isReadyToTrigger = true
-        }
-    }
-
     private func updateProgressIfNeeded() {
-        if !scrollViewState.isTriggered && !scrollViewState.isRefreshing && scrollViewState.isReadyToTrigger {
+        if !scrollViewState.isRefreshing && !scrollViewState.isTriggered {
             // initial pulling will increase progress to 1; then when drag finished or
             // fetch finished stopIfNeeded() will be called where progress will be set to 0.
             // isRefreshing check is here because we need to remove conflict between setting progress.
@@ -189,6 +183,14 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
             case .refreshing:
                 ProgressView()
                     .progressViewStyle(.circular)
+            case .finishing(let progress, let isTriggered):
+                if isTriggered {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                } else {
+                    ProgressView(value: progress, total: 1)
+                        .progressViewStyle(.linear)
+                }
             }
         },
         contentViewBuilder: { _ in
@@ -202,7 +204,6 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
 private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDelegate {
 
     @Published var isDragging: Bool = false
-    @Published var isReadyToTrigger: Bool = true
     @Published var isTriggered: Bool = false
     @Published var isRefreshing: Bool = false
     @Published var contentOffset: CGFloat = 0
@@ -210,14 +211,25 @@ private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDe
 
     private var panGestureRecognizer: UIPanGestureRecognizer?
 
+    let pullToRefreshAnimationHeight: CGFloat
+
     var state: PullToRefreshScrollViewState {
-        if isTriggered {
+        if isRefreshing {
             return .refreshing
-        } else if progress > 0 {
+        } else if progress > 0 && !isTriggered {
             return .pulling(progress: progress)
+        } else if contentOffset > 0 {
+            let progress = min(max((contentOffset * 2) / pullToRefreshAnimationHeight, 0), 1)
+            return .finishing(progress: progress, isTriggered: isTriggered)
         } else {
             return .idle
         }
+    }
+
+    // MARK: - Initialization
+
+    init(pullToRefreshAnimationHeight: CGFloat) {
+        self.pullToRefreshAnimationHeight = pullToRefreshAnimationHeight
     }
 
     // MARK: - Public
