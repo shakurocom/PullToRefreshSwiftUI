@@ -1,7 +1,7 @@
 ![Shakuro PullToRefreshSwiftUI](Resources/title_image.png)
 <br><br>
 # PullToRefreshSwiftUI
-![Version](https://img.shields.io/badge/version-1.2.3-blue.svg)
+![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg)
 ![License MIT](https://img.shields.io/badge/license-MIT-green.svg)
 
@@ -39,6 +39,14 @@ PullToRefreshScrollView(
         case .refreshing:
             ProgressView()
                 .progressViewStyle(.circular)
+        case .finishing(let progress, let isTriggered):
+            if isTriggered {
+                ProgressView()
+                    .progressViewStyle(.circular)
+            } else {
+                ProgressView(value: progress, total: 1)
+                    .progressViewStyle(.linear)
+            }
         }
     },
     contentViewBuilder: { _ in
@@ -76,6 +84,14 @@ PullToRefreshListView(
         case .refreshing:
             ProgressView()
                 .progressViewStyle(.circular)
+        case .finishing(let progress, let isTriggered):
+            if isTriggered {
+                ProgressView()
+                    .progressViewStyle(.circular)
+            } else {
+                ProgressView(value: progress, total: 1)
+                    .progressViewStyle(.linear)
+            }
         }
     },
     contentViewBuilder: { _ in
@@ -107,7 +123,7 @@ Add `PullToRefreshSwiftUI` as a dependency in your `Package.swift` manifest:
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/shakurocom/PullToRefreshSwiftUI.git", from: "1.2.3")
+  .package(url: "https://github.com/shakurocom/PullToRefreshSwiftUI.git", from: "1.3.0")
 ]
 ```
 
