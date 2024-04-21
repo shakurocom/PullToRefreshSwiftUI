@@ -91,7 +91,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                             .listRowInsets(EdgeInsets())
                             .readLayoutData(coordinateSpace: .global, onChange: { (data) in
                                 let offsetConclusive = data.frameInCoordinateSpace.minY - topOffset
-                                print("\(offsetConclusive) = \(data.frameInCoordinateSpace.minY) - \(topOffset)")
+                                debugPrint("Current offset: \(offsetConclusive) = \(data.frameInCoordinateSpace.minY) - \(topOffset)")
                                 scrollViewState.contentOffset = offsetConclusive
                                 updateProgressIfNeeded()
                                 stopIfNeeded()
@@ -109,7 +109,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
         })
         .readLayoutData(coordinateSpace: .global, onChange: { (data) in
             topOffset = data.frameInCoordinateSpace.minY
-            print("topOffset = \(topOffset)")
+            debugPrint("Setting topOffset = \(topOffset)")
         })
         .onAppear(perform: {
             scrollViewState.addGestureRecognizer()
