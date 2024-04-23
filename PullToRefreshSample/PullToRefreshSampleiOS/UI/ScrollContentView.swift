@@ -63,6 +63,8 @@ struct ScrollContentView: View {
                         case .lottie:
                             LottieView(animation: .named("animation-refreshing-shakuro_logo"))
                                 .playbackMode(.playing(.fromProgress(0, toProgress: 1, loopMode: .loop)))
+                                .opacity(progress)
+                                .scaleEffect(progress)
                         }
                     } else {
                         switch animationType {

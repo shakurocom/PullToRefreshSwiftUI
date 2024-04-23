@@ -19,10 +19,6 @@ public struct PullToRefreshScrollViewOptions {
 
 }
 
-private enum PullToRefreshScrollViewConstant {
-    static let coordinateSpace: String = "PullToRefreshScrollView.CoordinateSpace"
-}
-
 public enum PullToRefreshScrollViewState {
     case idle
     case pulling(progress: CGFloat)
@@ -41,6 +37,8 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
     private let contentViewBuilder: (_ scrollViewSize: CGSize) -> ContentViewType
 
     @StateObject private var scrollViewState: ScrollViewState
+
+    @State private var topOffset: CGFloat = 0
 
     // MARK: - Initialization
 
@@ -86,16 +84,21 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
                             .modifier(GeometryGroupModifier())
                     })
                     .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
-                    .readLayoutData(coordinateSpace: .named(PullToRefreshScrollViewConstant.coordinateSpace), onChange: { (data) in
-                        scrollViewState.contentOffset = data.frameInCoordinateSpace.minY
+                    .readLayoutData(coordinateSpace: .global, onChange: { (data) in
+                        let offsetConclusive = data.frameInCoordinateSpace.minY - topOffset
+                        debugPrint("Current offset: \(offsetConclusive) = \(data.frameInCoordinateSpace.minY) - \(topOffset)")
+                        scrollViewState.contentOffset = offsetConclusive
                         updateProgressIfNeeded()
                         stopIfNeeded()
                         resetReadyTriggeredStateIfNeeded()
                         startIfNeeded()
                     })
                 })
-                .coordinateSpace(name: PullToRefreshScrollViewConstant.coordinateSpace)
             })
+        })
+        .readLayoutData(coordinateSpace: .global, onChange: { (data) in
+            topOffset = data.frameInCoordinateSpace.minY
+            debugPrint("Setting topOffset = \(topOffset)")
         })
         .onAppear(perform: {
             scrollViewState.addGestureRecognizer()
