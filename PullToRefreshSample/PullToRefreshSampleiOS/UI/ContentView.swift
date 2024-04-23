@@ -1,3 +1,9 @@
+//
+//
+// Copyright (c) 2024 Shakuro (https://shakuro.com/)
+//
+//
+
 import SwiftUI
 
 struct ContentView: View {
