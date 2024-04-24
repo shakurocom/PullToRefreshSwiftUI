@@ -5,14 +5,18 @@
 ![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg)
 ![License MIT](https://img.shields.io/badge/license-MIT-green.svg)
 
+- [ScrollView](#scrollview)
+- [List](#list)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
 - [License](#license)
 
+`PullToRefreshSwiftUI` package contains `PullToRefreshScrollView` and `PullToRefreshListView` controls, that allows to add pull to refresh to ScrollView and List SwiftUI containers.
+
 ![](Resources/pull_to_refresh_example_main.gif)
 
-`PullToRefreshSwiftUI` package contains `PullToRefreshScrollView` and `PullToRefreshListView` controls, that allows to add pull to refresh to ScrollView and List SwiftUI containers.
+## ScrollView
 
 A `PullToRefreshScrollView` is a custom control that alows to put some content on scroll view with pull to refresh action.
 
@@ -58,6 +62,8 @@ PullToRefreshScrollView(
 ```
 
 ![](Resources/pull_to_refresh_example_1.gif)
+
+## List
 
 A `PullToRefreshListView` is a custom control that alows to add some content to list view with pull to refresh action.
 
