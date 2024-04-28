@@ -95,7 +95,6 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
                         debugPrint("Current offset: \(offsetConclusive) = \(data.frameInCoordinateSpace.minY) - \(topOffset)")
                         scrollViewState.contentOffset = offsetConclusive
                         updateProgressIfNeeded()
-                        stopIfNeeded()
                         resetReadyTriggeredStateIfNeeded()
                         startIfNeeded()
                     })
@@ -115,12 +114,12 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
         .onChange(of: isRefreshing.wrappedValue, perform: { (isRefreshing) in
             if !isRefreshing {
                 scrollViewState.isRefreshing = false
-                stopIfNeeded()
+                stopIfNeeded(animated: true)
                 resetReadyTriggeredStateIfNeeded()
             }
         })
         .onChange(of: scrollViewState.isDragging, perform: { (_) in
-            stopIfNeeded()
+            stopIfNeeded(animated: false)
             resetReadyTriggeredStateIfNeeded()
         })
     }
@@ -141,16 +140,32 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
         }
     }
 
-    private func stopIfNeeded() {
+    private func stopIfNeeded(animated: Bool) {
         if !scrollViewState.isRefreshing && !scrollViewState.isDragging {
             if scrollViewState.progress > 0 {
-                scrollViewState.progress = 0
+                if animated {
+                    scrollViewState.isFinishing = true
+                    Timer.scheduledTimer(withTimeInterval: 0.005, repeats: true, block: { (timer) in
+                        let progressLocal = scrollViewState.progress - 0.03
+                        if progressLocal <= 0 {
+                            scrollViewState.isFinishing = false
+                            scrollViewState.progress = 0
+                            resetReadyTriggeredStateIfNeeded()
+                            timer.invalidate()
+                        } else {
+                            scrollViewState.progress = progressLocal
+                        }
+                    })
+                } else {
+                    scrollViewState.progress = 0
+                }
             }
         }
     }
 
     private func resetReadyTriggeredStateIfNeeded() {
         if scrollViewState.contentOffset <= 1 &&
+            scrollViewState.progress == 0 &&
             scrollViewState.isTriggered &&
             !scrollViewState.isRefreshing &&
             !scrollViewState.isDragging {
@@ -160,7 +175,7 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
     }
 
     private func updateProgressIfNeeded() {
-        if !scrollViewState.isRefreshing && !scrollViewState.isTriggered {
+        if !scrollViewState.isRefreshing && !scrollViewState.isTriggered && !scrollViewState.isFinishing {
             // initial pulling will increase progress to 1; then when drag finished or
             // fetch finished stopIfNeeded() will be called where progress will be set to 0.
             // isRefreshing check is here because we need to remove conflict between setting progress.
@@ -215,6 +230,7 @@ private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDe
     @Published var isDragging: Bool = false
     @Published var isTriggered: Bool = false
     @Published var isRefreshing: Bool = false
+    @Published var isFinishing: Bool = false
     @Published var contentOffset: CGFloat = 0
     @Published var progress: CGFloat = 0
 
@@ -225,10 +241,9 @@ private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDe
     var state: PullToRefreshScrollViewState {
         if isRefreshing {
             return .refreshing
-        } else if progress > 0 && !isTriggered {
+        } else if progress > 0 && !isTriggered && !isFinishing {
             return .pulling(progress: progress)
-        } else if contentOffset > 0 {
-            let progress = min(max((contentOffset * 2) / pullToRefreshAnimationHeight, 0), 1)
+        } else if isFinishing {
             return .finishing(progress: progress, isTriggered: isTriggered)
         } else {
             return .idle

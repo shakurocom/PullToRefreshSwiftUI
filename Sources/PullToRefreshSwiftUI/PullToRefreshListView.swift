@@ -162,6 +162,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
 
     private func resetReadyTriggeredStateIfNeeded() {
         if scrollViewState.contentOffset <= 1 &&
+            scrollViewState.progress == 0 &&
             scrollViewState.isTriggered &&
             !scrollViewState.isRefreshing &&
             !scrollViewState.isDragging {
