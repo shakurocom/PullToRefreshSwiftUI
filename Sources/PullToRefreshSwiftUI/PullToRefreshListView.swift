@@ -47,6 +47,8 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
 
     @State private var topOffset: CGFloat = 0
 
+    private let isLogEnabled: Bool = false
+
     // MARK: - Initialization
 
     public init(options: PullToRefreshListViewOptions,
@@ -97,7 +99,9 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                             .listRowInsets(EdgeInsets())
                             .readLayoutData(coordinateSpace: .global, onChange: { (data) in
                                 let offsetConclusive = data.frameInCoordinateSpace.minY - topOffset
-                                debugPrint("Current offset: \(offsetConclusive) = \(data.frameInCoordinateSpace.minY) - \(topOffset)")
+                                if isLogEnabled {
+                                    debugPrint("Current offset: \(offsetConclusive) = \(data.frameInCoordinateSpace.minY) - \(topOffset)")
+                                }
                                 scrollViewState.contentOffset = offsetConclusive
                                 updateProgressIfNeeded()
                                 stopIfNeeded()
@@ -115,7 +119,9 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
         })
         .readLayoutData(coordinateSpace: .global, onChange: { (data) in
             topOffset = data.frameInCoordinateSpace.minY
-            debugPrint("Setting topOffset = \(topOffset)")
+            if isLogEnabled {
+                debugPrint("Setting topOffset = \(topOffset)")
+            }
         })
         .onAppear(perform: {
             scrollViewState.addGestureRecognizer()

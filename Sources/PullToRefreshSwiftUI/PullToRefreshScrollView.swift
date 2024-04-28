@@ -46,6 +46,8 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
 
     @State private var topOffset: CGFloat = 0
 
+    private let isLogEnabled: Bool = false
+
     // MARK: - Initialization
 
     public init(options: PullToRefreshScrollViewOptions,
@@ -92,7 +94,9 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
                     .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
                     .readLayoutData(coordinateSpace: .global, onChange: { (data) in
                         let offsetConclusive = data.frameInCoordinateSpace.minY - topOffset
-                        debugPrint("Current offset: \(offsetConclusive) = \(data.frameInCoordinateSpace.minY) - \(topOffset)")
+                        if isLogEnabled {
+                            debugPrint("Current offset: \(offsetConclusive) = \(data.frameInCoordinateSpace.minY) - \(topOffset)")
+                        }
                         scrollViewState.contentOffset = offsetConclusive
                         updateProgressIfNeeded()
                         resetReadyTriggeredStateIfNeeded()
@@ -103,7 +107,9 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
         })
         .readLayoutData(coordinateSpace: .global, onChange: { (data) in
             topOffset = data.frameInCoordinateSpace.minY
-            debugPrint("Setting topOffset = \(topOffset)")
+            if isLogEnabled {
+                debugPrint("Setting topOffset = \(topOffset)")
+            }
         })
         .onAppear(perform: {
             scrollViewState.addGestureRecognizer()
@@ -114,12 +120,13 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
         .onChange(of: isRefreshing.wrappedValue, perform: { (isRefreshing) in
             if !isRefreshing {
                 scrollViewState.isRefreshing = false
-                stopIfNeeded(animated: true)
+                scrollViewState.isFinishing = true
+                stopIfNeeded()
                 resetReadyTriggeredStateIfNeeded()
             }
         })
         .onChange(of: scrollViewState.isDragging, perform: { (_) in
-            stopIfNeeded(animated: false)
+            stopIfNeeded()
             resetReadyTriggeredStateIfNeeded()
         })
     }
@@ -140,10 +147,10 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
         }
     }
 
-    private func stopIfNeeded(animated: Bool) {
+    private func stopIfNeeded() {
         if !scrollViewState.isRefreshing && !scrollViewState.isDragging {
             if scrollViewState.progress > 0 {
-                if animated {
+                if scrollViewState.isTriggered {
                     scrollViewState.isFinishing = true
                     Timer.scheduledTimer(withTimeInterval: 0.005, repeats: true, block: { (timer) in
                         let progressLocal = scrollViewState.progress - 0.03
@@ -158,6 +165,7 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
                     })
                 } else {
                     scrollViewState.progress = 0
+                    resetReadyTriggeredStateIfNeeded()
                 }
             }
         }
