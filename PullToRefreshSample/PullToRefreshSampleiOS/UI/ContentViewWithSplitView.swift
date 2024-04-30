@@ -33,6 +33,7 @@ struct ContentViewWithSplitView: View {
                 }
             }
             .navigationTitle("Options")
+            .navigationBarTitleDisplayMode(.inline)
         } detail: {
             switch selectedOption {
             case .list:

@@ -236,10 +236,10 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
 private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDelegate {
 
     @Published var isDragging: Bool = false
-    @Published var isTriggered: Bool = false
-    @Published var isRefreshing: Bool = false
-    @Published var isFinishing: Bool = false
-    @Published var contentOffset: CGFloat = 0
+    var isTriggered: Bool = false
+    var isRefreshing: Bool = false
+    var isFinishing: Bool = false
+    var contentOffset: CGFloat = 0
     @Published var progress: CGFloat = 0
 
     private var panGestureRecognizer: UIPanGestureRecognizer?

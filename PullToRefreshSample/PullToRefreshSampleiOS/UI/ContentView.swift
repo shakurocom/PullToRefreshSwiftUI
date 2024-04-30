@@ -37,6 +37,7 @@ struct ContentView: View {
                 })
             })
             .navigationTitle("Options")
+            .navigationBarTitleDisplayMode(.inline)
         })
     }
 

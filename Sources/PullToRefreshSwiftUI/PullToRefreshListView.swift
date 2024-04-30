@@ -132,6 +132,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
         .onChange(of: isRefreshing.wrappedValue, perform: { (isRefreshing) in
             if !isRefreshing {
                 scrollViewState.isRefreshing = false
+                scrollViewState.isFinishing = true
                 stopIfNeeded()
                 resetReadyTriggeredStateIfNeeded()
             }
@@ -160,9 +161,18 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
 
     private func stopIfNeeded() {
         if !scrollViewState.isRefreshing && !scrollViewState.isDragging {
-            if scrollViewState.progress > 0 {
-                scrollViewState.progress = 0
-            }
+            scrollViewState.isFinishing = true
+            Timer.scheduledTimer(withTimeInterval: 0.005, repeats: true, block: { (timer) in
+                let progressLocal = scrollViewState.progress - 0.03
+                if progressLocal <= 0 {
+                    scrollViewState.isFinishing = false
+                    scrollViewState.progress = 0
+                    resetReadyTriggeredStateIfNeeded()
+                    timer.invalidate()
+                } else {
+                    scrollViewState.progress = progressLocal
+                }
+            })
         }
     }
 
@@ -178,12 +188,12 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
     }
 
     private func updateProgressIfNeeded() {
-        if !scrollViewState.isRefreshing && !scrollViewState.isTriggered {
+        if scrollViewState.isDragging && !scrollViewState.isRefreshing && !scrollViewState.isTriggered && !scrollViewState.isFinishing {
             // initial pulling will increase progress to 1; then when drag finished or
             // fetch finished stopIfNeeded() will be called where progress will be set to 0.
             // isRefreshing check is here because we need to remove conflict between setting progress.
             let progress = min(max(scrollViewState.contentOffset / options.pullToRefreshAnimationHeight, 0), 1)
-            if progress > scrollViewState.progress {
+            if progress > scrollViewState.progress { // dragging back to top leads to issues
                 scrollViewState.progress = progress
             }
         }
@@ -235,9 +245,10 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
 private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDelegate {
 
     @Published var isDragging: Bool = false
-    @Published var isTriggered: Bool = false
-    @Published var isRefreshing: Bool = false
-    @Published var contentOffset: CGFloat = 0
+    var isTriggered: Bool = false
+    var isRefreshing: Bool = false
+    var isFinishing: Bool = false
+    var contentOffset: CGFloat = 0
     @Published var progress: CGFloat = 0
 
     private var panGestureRecognizer: UIPanGestureRecognizer?
@@ -247,10 +258,9 @@ private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDe
     var state: PullToRefreshListViewState {
         if isRefreshing {
             return .refreshing
-        } else if progress > 0 && !isTriggered {
+        } else if progress > 0 && !isTriggered && !isFinishing {
             return .pulling(progress: progress)
-        } else if contentOffset > 0 {
-            let progress = min(max(contentOffset / pullToRefreshAnimationHeight, 0), 1)
+        } else if isFinishing {
             return .finishing(progress: progress, isTriggered: isTriggered)
         } else {
             return .idle
