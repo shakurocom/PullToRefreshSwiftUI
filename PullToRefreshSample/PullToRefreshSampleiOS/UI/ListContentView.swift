@@ -57,10 +57,9 @@ struct ListContentView: View {
 
     var body: some View {
         PullToRefreshListView(
-            options: PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 100,
-                                                  animationDuration: 0.3,
-                                                  animatePullingViewPresentation: true,
-                                                  animateRefreshingViewPresentation: true),
+            pullToRefreshAnimationHeight: 100,
+            pullToRefreshPullHeight: 100,
+            showsIndicators: true,
             isRefreshing: $isRefreshing,
             onRefresh: {
                 debugPrint("Refreshing")
@@ -78,7 +77,7 @@ struct ListContentView: View {
                     case .native:
                         CircleAnimationWithProgressView(progress: progress)
                     case .progressView:
-                        ProgressView(value: progress, total: 1)
+                        ProgressView(value: max(min(progress, 1), 0), total: 1)
                             .progressViewStyle(.linear)
                     case .lottie:
                         LottieView(animation: .named("animation-pulling-shakuro_logo"))
@@ -95,31 +94,16 @@ struct ListContentView: View {
                         LottieView(animation: .named("animation-refreshing-shakuro_logo"))
                             .playbackMode(.playing(.fromProgress(0, toProgress: 1, loopMode: .loop)))
                     }
-                case .finishing(let progress, let isTriggered):
-                    if isTriggered {
-                        switch animationType {
-                        case .native:
-                            CircleAnimationWithRepeatView()
-                        case .progressView:
-                            ProgressView()
-                                .progressViewStyle(.circular)
-                        case .lottie:
-                            LottieView(animation: .named("animation-refreshing-shakuro_logo"))
-                                .playbackMode(.playing(.fromProgress(0, toProgress: 1, loopMode: .loop)))
-                                .opacity(progress)
-                                .scaleEffect(progress)
-                        }
-                    } else {
-                        switch animationType {
-                        case .native:
-                            CircleAnimationWithProgressView(progress: progress)
-                        case .progressView:
-                            ProgressView(value: progress, total: 1)
-                                .progressViewStyle(.linear)
-                        case .lottie:
-                            LottieView(animation: .named("animation-pulling-shakuro_logo"))
-                                .playbackMode(.paused(at: .progress(progress)))
-                        }
+                case .finishing:
+                    switch animationType {
+                    case .native:
+                        CircleAnimationWithRepeatView()
+                    case .progressView:
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                    case .lottie:
+                        LottieView(animation: .named("animation-refreshing-shakuro_logo"))
+                            .playbackMode(.playing(.fromProgress(0, toProgress: 1, loopMode: .loop)))
                     }
                 }
             },

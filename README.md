@@ -1,7 +1,7 @@
 ![Shakuro PullToRefreshSwiftUI](Resources/title_image.png)
 <br><br>
 # PullToRefreshSwiftUI
-![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg)
 ![License MIT](https://img.shields.io/badge/license-MIT-green.svg)
 
@@ -23,42 +23,38 @@ A `PullToRefreshScrollView` is a custom control that alows to put some content o
 `PullToRefreshScrollView` example:
 
 ```swift
-PullToRefreshScrollView(
-    options: PullToRefreshScrollViewOptions(pullToRefreshAnimationHeight: 100,
-                                            animationDuration: 0.3,
-                                            animatePullingViewPresentation: true,
-                                            animateRefreshingViewPresentation: true),
-    isRefreshing: $isRefreshing,
-    onRefresh: {
-        debugPrint("Refreshing")
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(5), execute: {
-            isRefreshing = false
-        })
-    },
-    animationViewBuilder: { (state) in
-        switch state {
-        case .idle:
-            Color.clear
-        case .pulling(let progress):
-            ProgressView(value: progress, total: 1)
-                .progressViewStyle(.linear)
-        case .refreshing:
-            ProgressView()
-                .progressViewStyle(.circular)
-        case .finishing(let progress, let isTriggered):
-            if isTriggered {
-                ProgressView()
-                    .progressViewStyle(.circular)
-            } else {
+    PullToRefreshListView(
+        pullToRefreshAnimationHeight: 100,
+        pullToRefreshPullHeight: 100,
+        isRefreshing: .constant(true),
+        onRefresh: {
+            debugPrint("Refreshing")
+        },
+        animationViewBuilder: { (state) in
+            switch state {
+            case .idle:
+                Color.clear
+            case .pulling(let progress):
                 ProgressView(value: progress, total: 1)
                     .progressViewStyle(.linear)
+            case .refreshing:
+                ProgressView()
+                    .progressViewStyle(.circular)
+            case .finishing(let progress, let isTriggered):
+                if isTriggered {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                } else {
+                    ProgressView(value: progress, total: 1)
+                        .progressViewStyle(.linear)
+                }
             }
-        }
-    },
-    contentViewBuilder: { _ in
-        Color(.lightGray)
-            .frame(height: 1000)
-    })
+        },
+        contentViewBuilder: { _ in
+            ForEach(0..<5, content: { (item) in
+                Text("Item \(item)")
+            })
+        })
 ```
 
 ![](Resources/pull_to_refresh_example_1.gif)
@@ -131,7 +127,7 @@ Add `PullToRefreshSwiftUI` as a dependency in your `Package.swift` manifest:
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/shakurocom/PullToRefreshSwiftUI.git", from: "1.5.0")
+  .package(url: "https://github.com/shakurocom/PullToRefreshSwiftUI.git", from: "1.6.0")
 ]
 ```
 

@@ -6,29 +6,20 @@
 
 import SwiftUI
 
-public enum PullToRefreshScrollViewState {
-    case idle
-    case pulling(progress: CGFloat)
-    case refreshing
-    case finishing(progress: CGFloat, isTriggered: Bool)
-}
-
-public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: View>: View {
+public struct PullToRefreshListViewOldIOS<AnimationViewType: View, ContentViewType: View>: View {
 
     private let pullToRefreshAnimationHeight: CGFloat
     private let animationDuration: TimeInterval
+    private let offsetAboveRefreshingAnimation: CGFloat
     private let showsIndicators: Bool
     private let isPullToRefreshEnabled: Bool
-    private let offsetAboveRefreshingAnimation: CGFloat
     private let isRefreshing: Binding<Bool>
     private let onRefresh: () -> Void
-    private let animationViewBuilder: (_ state: PullToRefreshScrollViewState) -> AnimationViewType
+    private let animationViewBuilder: (_ state: PullToRefreshListViewState) -> AnimationViewType
     private let contentViewBuilder: (_ scrollViewSize: CGSize) -> ContentViewType
 
-    @StateObject private var scrollViewState: ScrollViewState
-
+    @StateObject private var scrollViewState: ScrollViewState2
     @State private var topOffset: CGFloat = 0
-
     private let isLogEnabled: Bool = false
 
     // MARK: - Initialization
@@ -40,18 +31,18 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
                 offsetAboveRefreshingAnimation: CGFloat = 0,
                 isRefreshing: Binding<Bool>,
                 onRefresh: @escaping () -> Void,
-                @ViewBuilder animationViewBuilder: @escaping (_ state: PullToRefreshScrollViewState) -> AnimationViewType,
+                @ViewBuilder animationViewBuilder: @escaping (_ state: PullToRefreshListViewState) -> AnimationViewType,
                 @ViewBuilder contentViewBuilder: @escaping (_ scrollViewSize: CGSize) -> ContentViewType) {
         self.pullToRefreshAnimationHeight = pullToRefreshAnimationHeight
         self.animationDuration = animationDuration
+        self.offsetAboveRefreshingAnimation = offsetAboveRefreshingAnimation
         self.showsIndicators = showsIndicators
         self.isPullToRefreshEnabled = isPullToRefreshEnabled
-        self.offsetAboveRefreshingAnimation = offsetAboveRefreshingAnimation
         self.isRefreshing = isRefreshing
         self.onRefresh = onRefresh
         self.animationViewBuilder = animationViewBuilder
         self.contentViewBuilder = contentViewBuilder
-        _scrollViewState = StateObject(wrappedValue: ScrollViewState(pullToRefreshAnimationHeight: pullToRefreshAnimationHeight))
+        _scrollViewState = StateObject(wrappedValue: ScrollViewState2(pullToRefreshAnimationHeight: pullToRefreshAnimationHeight))
     }
 
     // MARK: - UI
@@ -70,30 +61,44 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
                     .frame(height: pullToRefreshAnimationHeight)
                 Color.clear
             })
-            .opacity(isPullToRefreshEnabled ? 1 : 0)
-            // Scroll content
-            GeometryReader(content: { geometryProxy in
-                ScrollView(.vertical, showsIndicators: showsIndicators, content: {
-                    VStack(spacing: 0, content: {
+                .opacity(isPullToRefreshEnabled ? 1 : 0)
+            // List content
+            GeometryReader(content: { (geometryProxy) in
+                VStack(spacing: 0, content: {
+                    // view to show pull to refresh animations
+                    // List inset is calculated as safeAreaTopInset + this view height
+                    Color.clear
+                        .frame(height: pullToRefreshAnimationHeight * scrollViewState.progress)
+                    // scrolling direction is not possible to nicely calculate in old ios versions
+                    List(content: {
                         Color.clear
                             .frame(height: offsetAboveRefreshingAnimation)
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
                         Color.clear
-                            .frame(height: pullToRefreshAnimationHeight * scrollViewState.progress)
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                            .frame(height: 1)
+                            .listRowInsets(EdgeInsets())
+                            .readLayoutData(coordinateSpace: .global, onChange: { (data) in
+                                let offsetConclusive = data.frameInCoordinateSpace.minY - topOffset
+                                if isLogEnabled {
+                                    debugPrint("Current offset: \(offsetConclusive) = \(data.frameInCoordinateSpace.minY) - \(topOffset)")
+                                }
+                                scrollViewState.contentOffset = offsetConclusive
+                                updateProgressIfNeeded()
+                                stopIfNeeded()
+                                resetReadyTriggeredStateIfNeeded()
+                                startIfNeeded()
+                            })
                         contentViewBuilder(geometryProxy.size)
                             .modifier(GeometryGroupModifier())
                     })
-                    .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
-                    .readLayoutData(coordinateSpace: .global, onChange: { (data) in
-                        let offsetConclusive = data.frameInCoordinateSpace.minY - topOffset
-                        if isLogEnabled {
-                            debugPrint("Current offset: \(offsetConclusive) = \(data.frameInCoordinateSpace.minY) - \(topOffset)")
-                        }
-                        scrollViewState.contentOffset = offsetConclusive
-                        updateProgressIfNeeded()
-                        resetReadyTriggeredStateIfNeeded()
-                        startIfNeeded()
-                    })
+                        .environment(\.defaultMinListRowHeight, 0)
+                        .listStyle(PlainListStyle())
                 })
+                .animation(scrollViewState.isDragging ? nil : defaultAnimation, value: scrollViewState.progress)
             })
         })
         .readLayoutData(coordinateSpace: .global, onChange: { (data) in
@@ -126,7 +131,7 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
 
     private func startIfNeeded() {
         if isPullToRefreshEnabled,
-           (scrollViewState.contentOffset * 2) >  pullToRefreshAnimationHeight,
+           scrollViewState.contentOffset > pullToRefreshAnimationHeight,
            !scrollViewState.isTriggered &&
             !scrollViewState.isRefreshing {
 
@@ -140,25 +145,18 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
 
     private func stopIfNeeded() {
         if !scrollViewState.isRefreshing && !scrollViewState.isDragging {
-            if scrollViewState.progress > 0 {
-                if scrollViewState.isTriggered {
-                    scrollViewState.isFinishing = true
-                    Timer.scheduledTimer(withTimeInterval: 0.005, repeats: true, block: { (timer) in
-                        let progressLocal = scrollViewState.progress - 0.03
-                        if progressLocal <= 0 {
-                            scrollViewState.isFinishing = false
-                            scrollViewState.progress = 0
-                            resetReadyTriggeredStateIfNeeded()
-                            timer.invalidate()
-                        } else {
-                            scrollViewState.progress = progressLocal
-                        }
-                    })
-                } else {
+            scrollViewState.isFinishing = true
+            Timer.scheduledTimer(withTimeInterval: 0.005, repeats: true, block: { (timer) in
+                let progressLocal = scrollViewState.progress - 0.03
+                if progressLocal <= 0 {
+                    scrollViewState.isFinishing = false
                     scrollViewState.progress = 0
                     resetReadyTriggeredStateIfNeeded()
+                    timer.invalidate()
+                } else {
+                    scrollViewState.progress = progressLocal
                 }
-            }
+            })
         }
     }
 
@@ -174,11 +172,14 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
     }
 
     private func updateProgressIfNeeded() {
-        if !scrollViewState.isRefreshing && !scrollViewState.isTriggered && !scrollViewState.isFinishing {
+        if scrollViewState.isDragging && !scrollViewState.isRefreshing && !scrollViewState.isTriggered && !scrollViewState.isFinishing {
             // initial pulling will increase progress to 1; then when drag finished or
             // fetch finished stopIfNeeded() will be called where progress will be set to 0.
             // isRefreshing check is here because we need to remove conflict between setting progress.
-            scrollViewState.progress = min(max((scrollViewState.contentOffset * 2) /  pullToRefreshAnimationHeight, 0), 1)
+            let progress = min(max(scrollViewState.contentOffset / pullToRefreshAnimationHeight, 0), 1)
+            if progress > scrollViewState.progress { // dragging back to top leads to issues
+                scrollViewState.progress = progress
+            }
         }
     }
 
@@ -187,9 +188,8 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
 // MARK: - Preview
 
 #Preview(body: {
-    PullToRefreshScrollView(
+    PullToRefreshListViewOldIOS(
         pullToRefreshAnimationHeight: 100,
-        animationDuration: 0.3,
         isRefreshing: .constant(true),
         onRefresh: {
             debugPrint("Refreshing")
@@ -204,25 +204,21 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
             case .refreshing:
                 ProgressView()
                     .progressViewStyle(.circular)
-            case .finishing(let progress, let isTriggered):
-                if isTriggered {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                } else {
-                    ProgressView(value: progress, total: 1)
-                        .progressViewStyle(.linear)
-                }
+            case .finishing:
+                ProgressView()
+                    .progressViewStyle(.circular)
             }
         },
         contentViewBuilder: { _ in
-            Color(.lightGray)
-                .frame(height: 1000)
+            ForEach(0..<5, content: { (item) in
+                Text("Item \(item)")
+            })
         })
 })
 
 // MARK: - ScrollViewState
 
-private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDelegate {
+private class ScrollViewState2: NSObject, ObservableObject, UIGestureRecognizerDelegate {
 
     @Published var isDragging: Bool = false
     var isTriggered: Bool = false
@@ -235,13 +231,17 @@ private class ScrollViewState: NSObject, ObservableObject, UIGestureRecognizerDe
 
     let pullToRefreshAnimationHeight: CGFloat
 
-    var state: PullToRefreshScrollViewState {
+    var state: PullToRefreshListViewState {
         if isRefreshing {
             return .refreshing
         } else if progress > 0 && !isTriggered && !isFinishing {
             return .pulling(progress: progress)
         } else if isFinishing {
-            return .finishing(progress: progress, isTriggered: isTriggered)
+            if isTriggered {
+                return .pulling(progress: progress)
+            } else {
+                return .finishing
+            }
         } else {
             return .idle
         }
