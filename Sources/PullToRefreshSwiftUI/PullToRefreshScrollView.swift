@@ -6,25 +6,6 @@
 
 import SwiftUI
 
-public struct PullToRefreshScrollViewOptions {
-
-    public let pullToRefreshAnimationHeight: CGFloat
-    public let animationDuration: TimeInterval
-    public let animatePullingViewPresentation: Bool
-    public let animateRefreshingViewPresentation: Bool
-
-    public init(pullToRefreshAnimationHeight: CGFloat = 100,
-                animationDuration: TimeInterval = 0.3,
-                animatePullingViewPresentation: Bool = true,
-                animateRefreshingViewPresentation: Bool = true) {
-        self.pullToRefreshAnimationHeight = pullToRefreshAnimationHeight
-        self.animationDuration = animationDuration
-        self.animatePullingViewPresentation = animatePullingViewPresentation
-        self.animateRefreshingViewPresentation = animateRefreshingViewPresentation
-    }
-
-}
-
 public enum PullToRefreshScrollViewState {
     case idle
     case pulling(progress: CGFloat)
@@ -34,7 +15,8 @@ public enum PullToRefreshScrollViewState {
 
 public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: View>: View {
 
-    private let options: PullToRefreshScrollViewOptions
+    private let pullToRefreshAnimationHeight: CGFloat
+    private let animationDuration: TimeInterval
     private let showsIndicators: Bool
     private let isPullToRefreshEnabled: Bool
     private let offsetAboveRefreshingAnimation: CGFloat
@@ -51,7 +33,8 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
 
     // MARK: - Initialization
 
-    public init(options: PullToRefreshScrollViewOptions,
+    public init(pullToRefreshAnimationHeight: CGFloat,
+                animationDuration: TimeInterval = 0.3,
                 showsIndicators: Bool = true,
                 isPullToRefreshEnabled: Bool = true,
                 offsetAboveRefreshingAnimation: CGFloat = 0,
@@ -59,7 +42,8 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
                 onRefresh: @escaping () -> Void,
                 @ViewBuilder animationViewBuilder: @escaping (_ state: PullToRefreshScrollViewState) -> AnimationViewType,
                 @ViewBuilder contentViewBuilder: @escaping (_ scrollViewSize: CGSize) -> ContentViewType) {
-        self.options = options
+        self.pullToRefreshAnimationHeight = pullToRefreshAnimationHeight
+        self.animationDuration = animationDuration
         self.showsIndicators = showsIndicators
         self.isPullToRefreshEnabled = isPullToRefreshEnabled
         self.offsetAboveRefreshingAnimation = offsetAboveRefreshingAnimation
@@ -67,13 +51,13 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
         self.onRefresh = onRefresh
         self.animationViewBuilder = animationViewBuilder
         self.contentViewBuilder = contentViewBuilder
-        _scrollViewState = StateObject(wrappedValue: ScrollViewState(pullToRefreshAnimationHeight: options.pullToRefreshAnimationHeight))
+        _scrollViewState = StateObject(wrappedValue: ScrollViewState(pullToRefreshAnimationHeight: pullToRefreshAnimationHeight))
     }
 
     // MARK: - UI
 
     public var body: some View {
-        let defaultAnimation: Animation = .easeInOut(duration: options.animationDuration)
+        let defaultAnimation: Animation = .easeInOut(duration: animationDuration)
         ZStack(alignment: .top, content: {
             // Animations
             VStack(spacing: 0, content: {
@@ -83,7 +67,7 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
                     animationViewBuilder(scrollViewState.state)
                         .modifier(GeometryGroupModifier())
                 })
-                    .frame(height: options.pullToRefreshAnimationHeight)
+                    .frame(height: pullToRefreshAnimationHeight)
                 Color.clear
             })
             .opacity(isPullToRefreshEnabled ? 1 : 0)
@@ -94,7 +78,7 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
                         Color.clear
                             .frame(height: offsetAboveRefreshingAnimation)
                         Color.clear
-                            .frame(height: options.pullToRefreshAnimationHeight * scrollViewState.progress)
+                            .frame(height: pullToRefreshAnimationHeight * scrollViewState.progress)
                         contentViewBuilder(geometryProxy.size)
                             .modifier(GeometryGroupModifier())
                     })
@@ -142,7 +126,7 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
 
     private func startIfNeeded() {
         if isPullToRefreshEnabled,
-           (scrollViewState.contentOffset * 2) >  options.pullToRefreshAnimationHeight,
+           (scrollViewState.contentOffset * 2) >  pullToRefreshAnimationHeight,
            !scrollViewState.isTriggered &&
             !scrollViewState.isRefreshing {
 
@@ -194,7 +178,7 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
             // initial pulling will increase progress to 1; then when drag finished or
             // fetch finished stopIfNeeded() will be called where progress will be set to 0.
             // isRefreshing check is here because we need to remove conflict between setting progress.
-            scrollViewState.progress = min(max((scrollViewState.contentOffset * 2) /  options.pullToRefreshAnimationHeight, 0), 1)
+            scrollViewState.progress = min(max((scrollViewState.contentOffset * 2) /  pullToRefreshAnimationHeight, 0), 1)
         }
     }
 
@@ -204,10 +188,8 @@ public struct PullToRefreshScrollView<AnimationViewType: View, ContentViewType: 
 
 #Preview(body: {
     PullToRefreshScrollView(
-        options: PullToRefreshScrollViewOptions(pullToRefreshAnimationHeight: 100,
-                                                animationDuration: 0.3,
-                                                animatePullingViewPresentation: true,
-                                                animateRefreshingViewPresentation: true),
+        pullToRefreshAnimationHeight: 100,
+        animationDuration: 0.3,
         isRefreshing: .constant(true),
         onRefresh: {
             debugPrint("Refreshing")

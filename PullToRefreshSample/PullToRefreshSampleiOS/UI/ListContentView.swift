@@ -57,10 +57,9 @@ struct ListContentView: View {
 
     var body: some View {
         PullToRefreshListView(
-            options: PullToRefreshListViewOptions(pullToRefreshAnimationHeight: 100,
-                                                  animationDuration: 0.3,
-                                                  animatePullingViewPresentation: true,
-                                                  animateRefreshingViewPresentation: true),
+            pullToRefreshAnimationHeight: 100,
+            pullToRefreshPullHeight: 100,
+            showsIndicators: true,
             isRefreshing: $isRefreshing,
             onRefresh: {
                 debugPrint("Refreshing")

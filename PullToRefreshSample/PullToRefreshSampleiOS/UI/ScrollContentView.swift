@@ -21,10 +21,8 @@ struct ScrollContentView: View {
 
     var body: some View {
         PullToRefreshScrollView(
-            options: PullToRefreshScrollViewOptions(pullToRefreshAnimationHeight: 100,
-                                                    animationDuration: 0.3,
-                                                    animatePullingViewPresentation: true,
-                                                    animateRefreshingViewPresentation: true),
+            pullToRefreshAnimationHeight: 100,
+            animationDuration: 0.3,
             isRefreshing: $isRefreshing,
             onRefresh: {
                 debugPrint("Refreshing")
