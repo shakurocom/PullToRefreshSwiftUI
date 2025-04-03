@@ -10,7 +10,7 @@ public enum PullToRefreshListViewState: Equatable {
     case idle
     case pulling(progress: CGFloat)
     case refreshing
-    case finishing(progress: CGFloat, isTriggered: Bool)
+    case finishing  // state after refreshing - view returning to idle state
 }
 
 public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: View>: View {
@@ -104,14 +104,9 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
             case .refreshing:
                 ProgressView()
                     .progressViewStyle(.circular)
-            case .finishing(let progress, let isTriggered):
-                if isTriggered {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                } else {
-                    ProgressView(value: progress, total: 1)
-                        .progressViewStyle(.linear)
-                }
+            case .finishing:
+                ProgressView()
+                    .progressViewStyle(.circular)
             }
         },
         contentViewBuilder: { _ in

@@ -101,8 +101,11 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
                 of: { return $0 },
                 action: { (oldValue: ScrollGeometry, newValue: ScrollGeometry) -> Void in
                     scrollViewSize = newValue.bounds.size
-                    onScroll(oldValue.contentOffset.y, newValue.contentOffset.y)
-                    updateAnimationOffset(contentOffset: newValue.contentOffset.y)
+                    // top inset is usually added by standard navigation bar
+                    let oldOffsetY = oldValue.contentOffset.y + oldValue.contentInsets.top
+                    let newOffsetY = newValue.contentOffset.y + newValue.contentInsets.top
+                    onScroll(oldOffsetY, newOffsetY)
+                    updateAnimationOffset(contentOffset: newOffsetY)
                 })
             .onScrollPhaseChange({ (oldPhase: ScrollPhase, newPhase: ScrollPhase) -> Void in
                 pullToRefreshIsInteracting = newPhase == .interacting
@@ -124,6 +127,7 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
             .opacity(isPullToRefreshEnabled ? 1 : 0)
             .frame(height: pullToRefreshState == .refreshing ? pullToRefreshAnimationHeight : pullToRefreshProgressPoints,
                    alignment: .top)
+            .frame(maxWidth: .infinity)
             .clipped()
             .offset(x: 0, y: animationOffsetY + offsetAboveRefreshingAnimation)
     }
@@ -145,7 +149,7 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
         switch pullToRefreshState {
         case .idle,
                 .pulling:
-            if pullToRefreshProgressPoints <= 0 {
+            if pullToRefreshProgressPoints <= 0.5 {
                 pullToRefreshState = .idle
             } else {
                 let progress = pullToRefreshProgressPoints / pullToRefreshPullHeight
@@ -157,11 +161,10 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
             break
 
         case .finishing:
-            if pullToRefreshProgressPoints <= 0 {
+            if pullToRefreshProgressPoints <= 0.5 {
                 pullToRefreshState = .idle
             } else {
-                let progress = pullToRefreshProgressPoints / pullToRefreshPullHeight
-                pullToRefreshState = .finishing(progress: progress, isTriggered: true)
+                pullToRefreshState = .finishing
             }
         }
     }
@@ -211,8 +214,9 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
             break
 
         case .refreshing:
-            let progress = pullToRefreshProgressPoints / pullToRefreshPullHeight
-            pullToRefreshState = .finishing(progress: progress, isTriggered: true)
+            withAnimation(.easeInOut(duration: animationDuration), {
+                pullToRefreshState = .finishing
+            })
 
         case .finishing:
             // already finishing
@@ -243,14 +247,9 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
                 case .refreshing:
                     ProgressView()
                         .progressViewStyle(.circular)
-                case .finishing(let progress, let isTriggered):
-                    if isTriggered {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                    } else {
-                        ProgressView(value: progress, total: 1)
-                            .progressViewStyle(.linear)
-                    }
+                case .finishing:
+                    ProgressView()
+                        .progressViewStyle(.circular)
                 }
             },
             contentViewBuilder: { _ in

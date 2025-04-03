@@ -204,14 +204,9 @@ public struct PullToRefreshListViewOldIOS<AnimationViewType: View, ContentViewTy
             case .refreshing:
                 ProgressView()
                     .progressViewStyle(.circular)
-            case .finishing(let progress, let isTriggered):
-                if isTriggered {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                } else {
-                    ProgressView(value: progress, total: 1)
-                        .progressViewStyle(.linear)
-                }
+            case .finishing:
+                ProgressView()
+                    .progressViewStyle(.circular)
             }
         },
         contentViewBuilder: { _ in
@@ -242,7 +237,11 @@ private class ScrollViewState2: NSObject, ObservableObject, UIGestureRecognizerD
         } else if progress > 0 && !isTriggered && !isFinishing {
             return .pulling(progress: progress)
         } else if isFinishing {
-            return .finishing(progress: progress, isTriggered: isTriggered)
+            if isTriggered {
+                return .pulling(progress: progress)
+            } else {
+                return .finishing
+            }
         } else {
             return .idle
         }
