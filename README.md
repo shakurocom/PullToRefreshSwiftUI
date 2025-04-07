@@ -1,7 +1,7 @@
 ![Shakuro PullToRefreshSwiftUI](Resources/title_image.png)
 <br><br>
 # PullToRefreshSwiftUI
-![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.6.4-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg)
 ![License MIT](https://img.shields.io/badge/license-MIT-green.svg)
 
