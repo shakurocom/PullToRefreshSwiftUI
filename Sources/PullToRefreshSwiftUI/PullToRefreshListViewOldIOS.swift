@@ -82,9 +82,10 @@ public struct PullToRefreshListViewOldIOS<AnimationViewType: View, ContentViewTy
                             .frame(height: 1)
                             .listRowInsets(EdgeInsets())
                             .readLayoutData(coordinateSpace: .global, onChange: { (data) in
-                                let offsetConclusive = data.frameInCoordinateSpace.minY - topOffset
+                                let offsetConclusive = data.frameInCoordinateSpace.minY - topOffset - offsetAboveRefreshingAnimation
                                 if isLogEnabled {
-                                    debugPrint("Current offset: \(offsetConclusive) = \(data.frameInCoordinateSpace.minY) - \(topOffset)")
+                                    debugPrint("Current offset: \(offsetConclusive) = \(data.frameInCoordinateSpace.minY)" +
+                                               " - \(topOffset) - \(offsetAboveRefreshingAnimation)")
                                 }
                                 scrollViewState.contentOffset = offsetConclusive
                                 updateProgressIfNeeded()

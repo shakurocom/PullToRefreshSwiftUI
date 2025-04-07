@@ -60,6 +60,7 @@ struct ListContentView: View {
             pullToRefreshAnimationHeight: 100,
             pullToRefreshPullHeight: 100,
             showsIndicators: true,
+            offsetAboveRefreshingAnimation: 110,
             isRefreshing: $isRefreshing,
             onRefresh: {
                 debugPrint("Refreshing")

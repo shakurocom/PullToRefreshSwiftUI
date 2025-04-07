@@ -23,6 +23,7 @@ struct ScrollContentView: View {
         PullToRefreshScrollView(
             pullToRefreshAnimationHeight: 100,
             animationDuration: 0.3,
+            offsetAboveRefreshingAnimation: 110,
             isRefreshing: $isRefreshing,
             onRefresh: {
                 debugPrint("Refreshing")
