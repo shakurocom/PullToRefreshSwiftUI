@@ -15,7 +15,7 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
     private let offsetAboveRefreshingAnimation: CGFloat
     private let showsIndicators: Bool
     private let isPullToRefreshEnabled: Bool
-    private let onScroll: (_ oldOffsetY: CGFloat, _ newOffsetY: CGFloat) -> Void
+    private let onScroll: (_ oldOffsetY: CGFloat, _ newOffsetY: CGFloat, _ isInteracting: Bool) -> Void
     private let onEndDragging: () -> Void
     private let isRefreshing: Binding<Bool>
     private let onRefresh: () -> Void
@@ -25,7 +25,7 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
     @State private var scrollViewSize: CGSize = .zero   // needed to build content
     @State private var animationOffsetY: CGFloat = 0    // offset to keep refreshing animation in proper place
     @State private var pullToRefreshProgressPoints: CGFloat = 0 // progress of pull-to-refresh
-    @State private var pullToRefreshIsInteracting: Bool = false // user is actively dragging scroll
+    @State private var isInteracting: Bool = false // user is actively dragging scroll
     @State private var pullToRefreshState: PullToRefreshListViewState = .idle // state of the animation
 
     // MARK: - Initialization
@@ -36,7 +36,7 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
                 showsIndicators: Bool = true,
                 isPullToRefreshEnabled: Bool = true,
                 offsetAboveRefreshingAnimation: CGFloat = 0,
-                onScroll: @escaping (_ oldOffsetY: CGFloat, _ newOffsetY: CGFloat) -> Void = { _, _ in },
+                onScroll: @escaping (_ oldOffsetY: CGFloat, _ newOffsetY: CGFloat, _ isInteracting: Bool) -> Void = { _, _, _ in },
                 onEndDragging: @escaping () -> Void = { },
                 isRefreshing: Binding<Bool>,
                 onRefresh: @escaping () -> Void,
@@ -104,11 +104,11 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
                     // top inset is usually added by standard navigation bar
                     let oldOffsetY = oldValue.contentOffset.y + oldValue.contentInsets.top
                     let newOffsetY = newValue.contentOffset.y + newValue.contentInsets.top
-                    onScroll(oldOffsetY, newOffsetY)
+                    onScroll(oldOffsetY, newOffsetY, isInteracting)
                     updateAnimationOffset(contentOffset: newOffsetY)
                 })
             .onScrollPhaseChange({ (oldPhase: ScrollPhase, newPhase: ScrollPhase) -> Void in
-                pullToRefreshIsInteracting = newPhase == .interacting
+                isInteracting = newPhase == .interacting
                 if oldPhase == .interacting && newPhase != .interacting {
                     // user released finger
                     onEndDragging()
@@ -125,14 +125,22 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
                 .modifier(GeometryGroupModifier())
         })
             .opacity(isPullToRefreshEnabled ? 1 : 0)
-            .frame(height: pullToRefreshState == .refreshing ? pullToRefreshAnimationHeight : pullToRefreshProgressPoints,
-                   alignment: .top)
+            .frame(height: pullToRefreshAnimationViewHeight(), alignment: .top)
             .frame(maxWidth: .infinity)
             .clipped()
             .offset(x: 0, y: animationOffsetY + offsetAboveRefreshingAnimation)
     }
 
     // MARK: - Private
+
+    private func pullToRefreshAnimationViewHeight() -> CGFloat {
+        switch pullToRefreshState {
+        case .idle: return 0
+        case .pulling: return min(pullToRefreshProgressPoints, pullToRefreshAnimationHeight)
+        case .refreshing: return pullToRefreshAnimationHeight
+        case .finishing: return 0
+        }
+    }
 
     private func updateAnimationOffset(contentOffset: CGFloat) {
         if contentOffset > 0 {
@@ -153,7 +161,11 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
                 pullToRefreshState = .idle
             } else {
                 let progress = pullToRefreshProgressPoints / pullToRefreshPullHeight
-                pullToRefreshState = .pulling(progress: progress)
+                if progress >= 1.0 {
+                    triggerPullToRefresh()
+                } else {
+                    pullToRefreshState = .pulling(progress: progress)
+                }
             }
 
         case .refreshing:
@@ -182,12 +194,16 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
 
         case .pulling(let progress):
             if progress >= 1.0 {
-                pullToRefreshState = .refreshing
-                isRefreshing.wrappedValue = true
-                onRefresh()
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                triggerPullToRefresh()
             }
         }
+    }
+
+    private func triggerPullToRefresh() {
+        pullToRefreshState = .refreshing
+        isRefreshing.wrappedValue = true
+        onRefresh()
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     }
 
     private func showPullToRefreshAnimationIfNeeded() {

@@ -20,7 +20,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
     private let offsetAboveRefreshingAnimation: CGFloat
     private let showsIndicators: Bool
     private let isPullToRefreshEnabled: Bool
-    private let onScroll: (_ oldOffsetY: CGFloat, _ newOffsetY: CGFloat) -> Void
+    private let onScroll: (_ oldOffsetY: CGFloat, _ newOffsetY: CGFloat, _ isInteracting: Bool) -> Void
     private let onEndDragging: () -> Void
     private let isRefreshing: Binding<Bool>
     private let onRefresh: () -> Void
@@ -36,7 +36,7 @@ public struct PullToRefreshListView<AnimationViewType: View, ContentViewType: Vi
                 showsIndicators: Bool = true,
                 isPullToRefreshEnabled: Bool = true,
                 offsetAboveRefreshingAnimation: CGFloat = 0,
-                onScroll: @escaping (_ oldOffsetY: CGFloat, _ newOffsetY: CGFloat) -> Void = { _, _ in },
+                onScroll: @escaping (_ oldOffsetY: CGFloat, _ newOffsetY: CGFloat, _ isInteracting: Bool) -> Void = { _, _, _ in },
                 onEndDragging: @escaping () -> Void = { },
                 isRefreshing: Binding<Bool>,
                 onRefresh: @escaping () -> Void,
