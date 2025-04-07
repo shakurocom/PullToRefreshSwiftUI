@@ -8,6 +8,8 @@ import SwiftUI
 
 public struct GeometryGroupModifier: ViewModifier {
 
+    public init() { }
+
     public func body(content: Content) -> some View {
         if #available(iOS 17.0, *) {
             content
