@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
     s.name             = 'Shakuro.PullToRefreshSwiftUI'
-    s.version          = '1.6.4'
+    s.version          = '1.6.5'
     s.summary          = 'PullToRefreshSwiftUI'
     s.homepage         = 'https://github.com/shakurocom/PullToRefreshSwiftUI'
     s.license          = { :type => "MIT", :file => "LICENSE.md" }

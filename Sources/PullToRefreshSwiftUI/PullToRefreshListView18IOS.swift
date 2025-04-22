@@ -60,8 +60,8 @@ public struct PullToRefreshListView18IOS<AnimationViewType: View, ContentViewTyp
 
     public var body: some View {
         ZStack(alignment: .top, content: {
-            mainListView()
             pullToRefreshAnimationView()
+            mainListView()
         })
             .clipped()
             .onChange(of: isRefreshing.wrappedValue, { (_, newIsRefreshing: Bool) -> Void in
