@@ -164,4 +164,22 @@ Feel free to reach out and hire our team to develop a mobile or web project for 
 
 Explore our expertise in <a href="https://shakuro.com/services/native-mobile-development">Native Mobile Development</a> and <a href="https://shakuro.com/services/ios-dev">iOS Development</a>.</p>
 
-If you need professional assistance with your mobile or web project, feel free to <a href="https://shakuro.com/get-in-touch">contact our team</a>
+<button class="hire-button">Hire Shakuro</button>
+
+<style>
+.hire-button {
+    background-color: #2D2DFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.hire-button:hover {
+    opacity: 0.9;
+}
+</style>
